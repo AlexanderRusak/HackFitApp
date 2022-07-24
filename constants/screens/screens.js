@@ -1,0 +1,9 @@
+export const BodyConfiguration = 'BodyConfiguration';
+export const Age = 'Age';
+export const Summary = 'summary';
+export const Settings = 'settings';
+export const Workout = 'workout';
+export const Graphs = 'graphs';
+export const BodyParameters = 'Body Parameters';
+export const Weigh = 'Weigh';
+export const Height = 'Height';
