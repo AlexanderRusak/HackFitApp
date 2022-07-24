@@ -1,10 +1,10 @@
 import React, { useCallback, useContext, useState } from 'react'
 import { Text, StyleSheet, View } from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown'
-import Icon from 'react-native-vector-icons/FontAwesome'
 import { theme } from '../../styles/theme';
 import { COLORS } from '../../settings/constants';
 import { ThemeContext } from '../../context/ThemeContext';
+import { Icon } from '../ui/Icon/Icon';
 
 interface ISelectSection {
   title: string,
@@ -14,7 +14,6 @@ interface ISelectSection {
 }
 
 export const SelectSection = ({ title, defaultValue, dropDownArray, handleSelect }: ISelectSection) => {
-  Icon.loadFont()
   const { themeColor } = useContext(ThemeContext)
 
   const [selectedValueIndex, setSelectedValue] = useState(defaultValue ? dropDownArray.findIndex((item) =>
@@ -45,7 +44,7 @@ export const SelectSection = ({ title, defaultValue, dropDownArray, handleSelect
       rowTextStyle={{
         color: theme.colors.WHITE
       }}
-      renderDropdownIcon={() => <Icon style={styles.downIcon} name="angle-down" size={theme.mainFontSize} color={theme.colors.WHITE} />}
+      renderDropdownIcon={() => <Icon styles={styles.downIcon} iconName='angle-down'/>}
 
     />
   </View>
