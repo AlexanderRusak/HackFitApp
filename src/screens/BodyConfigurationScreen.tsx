@@ -63,12 +63,10 @@ export const BodyConfigurationScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
-      {bodyParametersState ? <><ButtonSection title='Age' defaultValue={bodyParametersState ? bodyParametersState.age : 0} handleScreen={handleScreen} />
-        <SelectSection title='Sex' defaultValue={bodyParametersState.sex} dropDownArray={['Male', 'Female']} handleSelect={handleSection} />
+    <ButtonSection title='Age' defaultValue={bodyParametersState ? bodyParametersState.age : 0} handleScreen={handleScreen} />
+        <SelectSection title='Sex' defaultValue={'Male'} dropDownArray={['Male', 'Female']} handleSelect={handleSection} />
         <ButtonSection title='Weigh' defaultValue={bodyParametersState ? bodyParametersState.weigh : 0} handleScreen={handleScreen} />
         <ButtonSection title='Height' defaultValue={bodyParametersState ? bodyParametersState.height : 0} handleScreen={handleScreen} />
-      </>
-        : <ActivityIndicator />}
     </View>
   );
 }
