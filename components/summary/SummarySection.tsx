@@ -19,8 +19,6 @@ export const SummarySection = ({ textValue, headerName, type }: SummarySectionPr
   const { color, energy } = useSelector((store: IStore) => store.settingsParameter);
   const { data } = useSelector((store: IStore) => store.bodyParameters)
 
-
-
   const sectionData = {
     Lungs: {
       src: require('../../static/images/lungs.png'),

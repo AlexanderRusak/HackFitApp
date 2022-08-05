@@ -10,14 +10,14 @@ import { BodyParameter } from '../screens/BodyParameterScreen';
 import { useDispatch } from 'react-redux';
 import { Dispatch } from 'redux';
 import { ThemeContext } from '../../context/ThemeContext';
-import { loadBodyParameters } from '../../store/actions/bodyParameters';
+import { loadBodyParameters, saveBodyParameters } from '../../store/actions/bodyParameters';
 import { saveSettingsParameters } from '../../store/actions/settingsParameter';
 import { SettingsParameters } from '../../store/types/settingsParameters';
 import { theme } from '../../styles/theme';
 import { Age, BodyConfiguration, BodyParameters, Height, Weigh } from '../../constants/screens/screens';
 import { STORAGE_KEYS } from '../../storage/constants';
 import { getDataFromStorage, setDataToStorage } from '../../storage/storageHelpers';
-import { initialSettings } from '../../storage/inititalStates';
+import { initialBodyParameters, initialSettings } from '../../storage/inititalStates';
 
 
 
@@ -49,8 +49,8 @@ export const MainEntry = () => {
 
 
   useEffect(() => {
-    dispatch(loadBodyParameters());
-    /* dispatch(saveBodyParameters([initialBodyParameters])) */
+    /* dispatch(loadBodyParameters()); */
+    dispatch(saveBodyParameters([initialBodyParameters]))
   }, []);
 
   return (

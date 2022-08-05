@@ -18,7 +18,7 @@ export const BodyConfigurationScreen = ({ navigation }: any) => {
   const isFocused = useIsFocused();
   const { data: bodyParameters } = useSelector((store: IStore) => store.bodyParameters)
   const dispatch = useDispatch<Dispatch<any>>()
-  const [bodyParametersState, setBodyParametersState] = useState<BodyParameters>(bodyParameters[bodyParameters.length - 1]);
+  const [bodyParametersState, setBodyParametersState] = useState<BodyParameters>([] as unknown as BodyParameters);
 
   useEffect(() => {
     const getBodyParameters = async () => {
@@ -63,10 +63,10 @@ export const BodyConfigurationScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
-    <ButtonSection title='Age' defaultValue={bodyParametersState ? bodyParametersState.age : 0} handleScreen={handleScreen} />
-        <SelectSection title='Sex' defaultValue={'Male'} dropDownArray={['Male', 'Female']} handleSelect={handleSection} />
-        <ButtonSection title='Weigh' defaultValue={bodyParametersState ? bodyParametersState.weigh : 0} handleScreen={handleScreen} />
-        <ButtonSection title='Height' defaultValue={bodyParametersState ? bodyParametersState.height : 0} handleScreen={handleScreen} />
+      <ButtonSection title='Age' defaultValue={bodyParametersState ? bodyParametersState.age : 0} handleScreen={handleScreen} />
+      <SelectSection title='Sex' defaultValue={'Not set'} dropDownArray={['Male', 'Female']} handleSelect={handleSection} />
+      <ButtonSection title='Weigh' defaultValue={bodyParametersState ? bodyParametersState.weigh : 0} handleScreen={handleScreen} />
+      <ButtonSection title='Height' defaultValue={bodyParametersState ? bodyParametersState.height : 0} handleScreen={handleScreen} />
     </View>
   );
 }
@@ -77,5 +77,5 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.WHITE,
   },
 });
- 
+
 

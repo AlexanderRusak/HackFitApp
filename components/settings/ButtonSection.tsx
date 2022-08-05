@@ -3,6 +3,7 @@ import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { theme } from '../../styles/theme';
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { ThemeContext } from '../../context/ThemeContext';
+import { Icon } from '../ui/Icon/Icon';
 
 
 interface IButtonSection {
@@ -13,7 +14,10 @@ interface IButtonSection {
 
 export const ButtonSection = ({ defaultValue, title, handleScreen }: IButtonSection) => {
 
-  const { themeColor } = useContext(ThemeContext)
+  const { themeColor } = useContext(ThemeContext);
+
+  console.log(defaultValue);
+  
 
   const handleSelectHandler = useCallback(() => {
     handleScreen(title, defaultValue);
@@ -26,7 +30,7 @@ export const ButtonSection = ({ defaultValue, title, handleScreen }: IButtonSect
       <Text
         style={styles.button}
       >{defaultValue ? defaultValue : 'Not Set'}</Text>
-      <AntDesign style={styles.downIcon} name="right" size={theme.mainFontSize} color={theme.colors.WHITE} />
+      <Icon iconName='angle-right' styles={styles.downIcon} />
     </TouchableOpacity>
   </View>
 }
@@ -46,7 +50,8 @@ const styles = StyleSheet.create({
   },
   downIcon: {
     position: "relative",
-    left: '100%'
+    left: '100%',
+    paddingRight: '5%',
   },
   buttonContainer: {
     display: 'flex',

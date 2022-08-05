@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { StyleSheet, View, Text } from 'react-native';
+import { VictoryBar } from 'victory-native';
 
 
 export const GraphsScreen = () => {
@@ -13,7 +14,7 @@ export const GraphsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text>Graphs Screen</Text>
+      <VictoryBar />
     </View>
   );
 }

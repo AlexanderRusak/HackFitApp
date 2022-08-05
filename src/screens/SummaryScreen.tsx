@@ -12,8 +12,6 @@ export const SummaryScreen = () => {
   const { data } = useSelector((store: IStore) => store.bodyParameters);
 
 
-
-
   const saturationSection = useMemo(() => {
     return <SummarySection
       headerName='Saturation'
@@ -58,7 +56,7 @@ export const SummaryScreen = () => {
     return <SummarySection
       headerName='Current Weight'
       type={imageType.Scales}
-      textValue={data && data.length && data[data.length - 1].weigh.toString() || ''}
+      textValue={data && data.length && data[data.length - 1]?.weigh?.toString() || ''}
     />
   }, [data, data.length]);
 

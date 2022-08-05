@@ -28,7 +28,7 @@ export const BodyParameter = ({ route, navigation }: any) => {
   const { params } = route;
   const { isMeasuring, type, bodyData }: ParameterParams = params;
 
-  const [bodyState, setBodyDataState] = useState<BodyParameters>(bodyData[bodyData.length - 1]);
+  const [bodyState, setBodyDataState] = useState<BodyParameters>(bodyData[bodyData.length - 1] || []);
 
 
 
@@ -51,7 +51,7 @@ export const BodyParameter = ({ route, navigation }: any) => {
 
   const dropArray = type === 'height' ? HEIGHT : WEIGH;
 
-  const defaultDropArrayValue = type === 'height' ? bodyState.heightUnits : bodyState.weighUnits;
+  const defaultDropArrayValue = type === 'height' ? bodyState.heightUnits || 'cm' : bodyState.weighUnits || 'kg';
 
   const bodyParameterComponent = useMemo(
     () => {
