@@ -9,9 +9,6 @@ export const GraphsScreen = () => {
 
   const { params } = useRoute()
 
-  console.log(params);
-
-
   return (
     <View style={styles.container}>
       <VictoryBar />

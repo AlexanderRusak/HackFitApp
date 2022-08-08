@@ -16,6 +16,8 @@ export const InputSection = ({ title, handleInput, maxLength, placeholder, defau
   const { themeColor } = useContext(ThemeContext)
 
   const handleInputHandler = useCallback((text: string) => {
+    console.log(text);
+    
     handleInput && handleInput(text)
   }, [])
 

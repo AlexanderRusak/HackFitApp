@@ -52,6 +52,7 @@ export const BodyConfigurationScreen = ({ navigation }: any) => {
   }, [bodyParametersState, navigation])
 
   const handleScreen = (nameScreen: string, data: number) => {
+    console.log(nameScreen, data);
 
     bodyParametersState && navigation.navigate(nameScreen, {
       isMeasuring: !!["Weigh", "Height"].find((name) => name === nameScreen),
@@ -60,6 +61,8 @@ export const BodyConfigurationScreen = ({ navigation }: any) => {
       bodyData: bodyParameters
     } as unknown as ParameterParams);
   }
+
+
 
   return (
     <View style={styles.container}>

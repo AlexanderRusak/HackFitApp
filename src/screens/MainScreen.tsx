@@ -27,8 +27,6 @@ export const MainScreen = () => {
     const isFocused = useIsFocused();
 
     useEffect(() => {
-        console.log(data, 'dssss');
-
         isPushToSetting(data.length ? data[0] : [], navigate)
     }, [isFocused])
 

@@ -43,7 +43,7 @@ export const MainEntry = () => {
         dispatch(saveSettingsParameters({ color, energy, language }));
         setThemeColor(color)
       }
-    }
+    } 
     getData();
   });
 

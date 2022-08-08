@@ -26,6 +26,7 @@ export const BodyParameter = ({ route, navigation }: any) => {
 
   const dispatch = useDispatch<Dispatch<any>>();
   const { params } = route;
+
   const { isMeasuring, type, bodyData }: ParameterParams = params;
 
   const [bodyState, setBodyDataState] = useState<BodyParameters>(bodyData[bodyData.length - 1] || []);
@@ -33,6 +34,8 @@ export const BodyParameter = ({ route, navigation }: any) => {
 
 
   const handleSave = () => {
+    //here
+
     const lastBodyDataParameter = bodyData[bodyData.length - 1]
     isFullBodyParameters(lastBodyDataParameter) ?
       dispatch(saveBodyParameters([...bodyData, bodyState])) :

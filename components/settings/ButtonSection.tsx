@@ -16,9 +16,6 @@ export const ButtonSection = ({ defaultValue, title, handleScreen }: IButtonSect
 
   const { themeColor } = useContext(ThemeContext);
 
-  console.log(defaultValue);
-  
-
   const handleSelectHandler = useCallback(() => {
     handleScreen(title, defaultValue);
   }, [handleScreen])
