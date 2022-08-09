@@ -5,7 +5,7 @@ import { theme } from '../../styles/theme';
 
 interface InputSectionProps {
   title?: string,
-  handleInput?: (name: string) => void,
+  handleInput: (name: string) => void,
   maxLength?: number,
   placeholder?: string,
   defaultValue?: number
@@ -13,13 +13,11 @@ interface InputSectionProps {
 
 export const InputSection = ({ title, handleInput, maxLength, placeholder, defaultValue }: InputSectionProps) => {
 
-  const { themeColor } = useContext(ThemeContext)
+  const { themeColor } = useContext(ThemeContext);
 
   const handleInputHandler = useCallback((text: string) => {
-    console.log(text);
-    
-    handleInput && handleInput(text)
-  }, [])
+    handleInput(text)
+  }, [handleInput])
 
   return <View style={{ ...styles.container, borderColor: themeColor }}>
     <Text style={{ ...styles.sectionTitle, borderColor: themeColor, color: themeColor }}>{title}</Text>

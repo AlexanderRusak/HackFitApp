@@ -49,8 +49,8 @@ export const MainEntry = () => {
 
 
   useEffect(() => {
-    /* dispatch(loadBodyParameters()); */
-    dispatch(saveBodyParameters([initialBodyParameters]))
+    dispatch(loadBodyParameters());
+    /* dispatch(saveBodyParameters([initialBodyParameters])) */
   }, []);
 
   return (

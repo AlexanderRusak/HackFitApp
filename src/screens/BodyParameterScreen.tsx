@@ -29,12 +29,12 @@ export const BodyParameter = ({ route, navigation }: any) => {
 
   const { isMeasuring, type, bodyData }: ParameterParams = params;
 
-  const [bodyState, setBodyDataState] = useState<BodyParameters>(bodyData[bodyData.length - 1] || []);
+  console.log(bodyData);
+  
 
-
+  const [bodyState, setBodyDataState] = useState<BodyParameters>(bodyData[bodyData.length - 1]);
 
   const handleSave = () => {
-    //here
 
     const lastBodyDataParameter = bodyData[bodyData.length - 1]
     isFullBodyParameters(lastBodyDataParameter) ?

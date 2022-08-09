@@ -16,14 +16,13 @@ export const ButtonSection = ({ defaultValue, title, handleScreen }: IButtonSect
 
   const { themeColor } = useContext(ThemeContext);
 
-  const handleSelectHandler = useCallback(() => {
+  const handleSelectHandler = useCallback(() => {   
     handleScreen(title, defaultValue);
   }, [handleScreen])
 
   return <View style={{ ...styles.container, borderColor: themeColor }}>
     <Text style={{ ...styles.sectionTitle, color: themeColor }}>{title}</Text>
     <TouchableOpacity style={{ ...styles.buttonContainer, backgroundColor: themeColor }} onPress={handleSelectHandler} >
-
       <Text
         style={styles.button}
       >{defaultValue ? defaultValue : 'Not Set'}</Text>

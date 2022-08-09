@@ -15,22 +15,11 @@ interface ISelectSection {
 
 export const SelectSection = ({ title, defaultValue, dropDownArray, handleSelect }: ISelectSection) => {
   const { themeColor } = useContext(ThemeContext);
-
-  useEffect(()=>{
-    title.toLowerCase()==='sex'&&setArray([...dropDownArray,'Not Set'])
-  },[title])
-
-  const [array, setArray] = useState<string[]>([...dropDownArray])
-
-  const [selectedValueIndex, setSelectedValue] = useState(array && array.length ? array.findIndex((item) =>
-    item.toLowerCase() === defaultValue.toLowerCase()) : -1);
+  console.log(defaultValue);
 
 
   const handleSelectHandler = useCallback((selectedItem: string) => {
-    const valueIndex = dropDownArray.findIndex((item) => item.toLowerCase() === selectedItem.toLowerCase());
-    setSelectedValue((valueIndex > -1) ? valueIndex : -1);
-
-    handleSelect(title === 'Color Schema' ? COLORS[selectedItem.replace(/\s+/g, '').toLowerCase() as 'burgundi' | 'veriperi'].value : selectedItem.toLowerCase(), title);
+    handleSelect(title === 'Color Schema' ? COLORS[selectedItem.replace(/\s+/g, '').toLowerCase() as 'burgundi' | 'veriperi'].value : selectedItem, title);
   }, [handleSelect]);
 
   return <View style={{ ...styles.container, borderColor: themeColor }}>
@@ -46,7 +35,7 @@ export const SelectSection = ({ title, defaultValue, dropDownArray, handleSelect
         color: theme.colors.WHITE,
         fontSize: theme.mainFontSize
       }}
-      defaultValueByIndex={selectedValueIndex>1? selectedValueIndex: array.length - 1}
+      defaultButtonText={defaultValue}
       data={dropDownArray}
       onSelect={handleSelectHandler}
       rowTextStyle={{
