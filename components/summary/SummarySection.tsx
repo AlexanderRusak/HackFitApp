@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import { Graphs } from '../../constants/screens/screens'
 import  { IStore } from '../../store'
 import { theme } from '../../styles/theme'
+import { Fonts, Icon } from '../ui/Icon/Icon';
 export interface SummarySectionProps {
   headerName: string,
   textValue: string,
@@ -21,27 +22,33 @@ export const SummarySection = ({ textValue, headerName, type }: SummarySectionPr
 
   const sectionData = {
     Lungs: {
-      src: require('../../static/images/lungs.png'),
+      font:'MaterialCommunityIcons' as keyof typeof Fonts,
+      name:'lungs',
       unit: '%'
     },
     Calories: {
-      src: require('../../static/images/calories.png'),
+      font:'MaterialCommunityIcons' as keyof typeof Fonts,
+      name:'lungs',
       unit: energy
     },
     Glucose: {
-      src: require('../../static/images/glucose.png'),
+      font:'MaterialCommunityIcons' as keyof typeof Fonts,
+      name:'lungs',
       unit: 'g/mmol'
     },
     Heart: {
-      src: require('../../static/images/heart.png'),
+      font:'MaterialCommunityIcons' as keyof typeof Fonts,
+      name:'lungs',
       unit: 'BPM'
     },
     Scales: {
-      src: require('../../static/images/scales.png'),
+      font:'MaterialCommunityIcons' as keyof typeof Fonts,
+      name:'lungs',
       unit: data && data.length && data[data.length - 1].weighUnits
     },
     Steps: {
-      src: require('../../static/images/steps.png'),
+      font:'MaterialCommunityIcons' as keyof typeof Fonts,
+      name:'lungs',
       unit: 'steps'
     },
   };
@@ -59,10 +66,7 @@ export const SummarySection = ({ textValue, headerName, type }: SummarySectionPr
       <View style={styles.textContainer}>
         <Text style={styles.headerName}>{headerName}</Text>
       </View>
-      <Image
-        style={styles.image}
-        source={sectionData[type as keyof typeof sectionData].src}
-      />
+      <Icon iconFont={sectionData[type as keyof typeof sectionData].font} iconName={sectionData[type as keyof typeof sectionData].name}/>
     </View>
     <View style={styles.dataBlock}>
       <Text style={styles.text}>{textValue} {sectionData[type as keyof typeof sectionData].unit}</Text>

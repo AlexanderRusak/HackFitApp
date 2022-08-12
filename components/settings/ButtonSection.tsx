@@ -26,7 +26,7 @@ export const ButtonSection = ({ defaultValue, title, handleScreen }: IButtonSect
       <Text
         style={styles.button}
       >{defaultValue ? defaultValue : 'Not Set'}</Text>
-      <Icon iconName='angle-right' styles={styles.downIcon} />
+      <Icon iconName='angle-right' iconFont={'FontAwesomeIcon'} styles={styles.downIcon} />
     </TouchableOpacity>
   </View>
 }
