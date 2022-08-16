@@ -6,6 +6,7 @@ import { Graphs } from '../../constants/screens/screens'
 import  { IStore } from '../../store'
 import { theme } from '../../styles/theme'
 import { Fonts, Icon } from '../ui/Icon/Icon';
+
 export interface SummarySectionProps {
   headerName: string,
   textValue: string,
@@ -28,27 +29,27 @@ export const SummarySection = ({ textValue, headerName, type }: SummarySectionPr
     },
     Calories: {
       font:'MaterialCommunityIcons' as keyof typeof Fonts,
-      name:'lungs',
+      name:'food',
       unit: energy
     },
     Glucose: {
-      font:'MaterialCommunityIcons' as keyof typeof Fonts,
-      name:'lungs',
+      font:'Fontisto' as keyof typeof Fonts,
+      name:'blood-drop',
       unit: 'g/mmol'
     },
     Heart: {
-      font:'MaterialCommunityIcons' as keyof typeof Fonts,
-      name:'lungs',
+      font:'Fontisto' as keyof typeof Fonts,
+      name:'pulse',
       unit: 'BPM'
     },
     Scales: {
       font:'MaterialCommunityIcons' as keyof typeof Fonts,
-      name:'lungs',
+      name:'scale-bathroom',
       unit: data && data.length && data[data.length - 1].weighUnits
     },
     Steps: {
       font:'MaterialCommunityIcons' as keyof typeof Fonts,
-      name:'lungs',
+      name:'walk',
       unit: 'steps'
     },
   };
@@ -66,7 +67,7 @@ export const SummarySection = ({ textValue, headerName, type }: SummarySectionPr
       <View style={styles.textContainer}>
         <Text style={styles.headerName}>{headerName}</Text>
       </View>
-      <Icon iconFont={sectionData[type as keyof typeof sectionData].font} iconName={sectionData[type as keyof typeof sectionData].name}/>
+      <Icon size={50} iconFont={sectionData[type as keyof typeof sectionData].font} iconName={sectionData[type as keyof typeof sectionData].name}/>
     </View>
     <View style={styles.dataBlock}>
       <Text style={styles.text}>{textValue} {sectionData[type as keyof typeof sectionData].unit}</Text>
@@ -83,13 +84,14 @@ const styles = StyleSheet.create({
     flexDirection: 'column'
   },
   headerBlock: {
+    height:'30%',
     marginTop: 10,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-around',
   },
   textContainer: {
-    width: '50%',
+    width: '60%',
   },
   headerName: {
     color: theme.colors.WHITE,
@@ -104,8 +106,4 @@ const styles = StyleSheet.create({
     color: theme.colors.WHITE,
     fontSize: theme.mainFontSize * 1.5
   },
-  image: {
-    width: 50,
-    height: 50,
-  }
 })

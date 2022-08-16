@@ -1,7 +1,8 @@
 import React from "react";
 import { ColorValue } from "react-native";
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
-import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import FontAwesome5Pro from "react-native-vector-icons/FontAwesome5Pro";
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
@@ -18,8 +19,9 @@ import { theme } from "../../../styles/theme";
 
 
 export const Fonts = {
-    FontAwesomeIcon,
-    FontAwesome5Icon,
+    FontAwesome,
+    FontAwesome5,
+    FontAwesome5Pro,
     AntDesign,
     Entypo,
     EvilIcons,

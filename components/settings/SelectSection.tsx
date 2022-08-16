@@ -41,7 +41,7 @@ export const SelectSection = ({ title, defaultValue, dropDownArray, handleSelect
       rowTextStyle={{
         color: theme.colors.WHITE
       }}
-      renderDropdownIcon={() => <Icon styles={styles.downIcon} iconFont='FontAwesomeIcon' iconName='angle-down' />}
+      renderDropdownIcon={() => <Icon styles={styles.downIcon} iconFont='AntDesign' iconName='down' />}
 
     />
   </View>
