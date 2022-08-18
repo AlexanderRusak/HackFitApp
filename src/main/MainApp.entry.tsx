@@ -14,7 +14,7 @@ import { loadBodyParameters, saveBodyParameters } from '../../store/actions/body
 import { saveSettingsParameters } from '../../store/actions/settingsParameter';
 import { SettingsParameters } from '../../store/types/settingsParameters';
 import { theme } from '../../styles/theme';
-import { Age, BodyConfiguration, BodyParameters, Height, Weigh } from '../../constants/screens/screens';
+import { Age, BodyConfiguration, BodyParameters, Height, Weight } from '../../constants/screens/screens';
 import { STORAGE_KEYS } from '../../storage/constants';
 import { getDataFromStorage, setDataToStorage } from '../../storage/storageHelpers';
 import { initialBodyParameters, initialSettings } from '../../storage/inititalStates';
@@ -93,7 +93,7 @@ export const MainEntry = () => {
               },
               headerTintColor: theme.colors.WHITE
             }}
-            name={Weigh} component={BodyParameter} />
+            name={Weight} component={BodyParameter} />
           <Stack.Screen
             options={{
               headerBackTitle: BodyParameters,

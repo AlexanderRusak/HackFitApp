@@ -7,7 +7,7 @@ import { SelectSection } from '../../components/settings/SelectSection';
 import { Button } from '../../components/ui/Button/Button';
 import { BodyConfiguration } from '../../constants/screens/screens';
 import { isFullBodyParameters } from '../../logic/helpers/helpers';
-import { HEIGHT, WEIGH } from '../../logic/measure/constants';
+import { HEIGHT, WEIGHT } from '../../logic/measure/constants';
 import { saveBodyParameters } from '../../store/actions/bodyParameters';
 import { BodyParameters } from '../../store/types/settingsParameters';
 import { theme } from '../../styles/theme';
@@ -20,7 +20,7 @@ export interface ParameterParams {
   bodyData: BodyParameters[]
 }
 
-export type UnitTypes = 'weigh' | 'height' | 'age';
+export type UnitTypes = 'weight' | 'height' | 'age';
 
 export const BodyParameter = ({ route, navigation }: any) => {
 
@@ -52,7 +52,7 @@ export const BodyParameter = ({ route, navigation }: any) => {
     setBodyDataState({ ...bodyState, [type.toLowerCase()]: +name, dateTime: new Date().getTime() })
   }
 
-  const dropArray = type === 'height' ? HEIGHT : WEIGH;
+  const dropArray = type === 'height' ? HEIGHT : WEIGHT;
 
   const defaultDropArrayValue = type === 'height' ? bodyState.heightUnits || 'cm' : bodyState.weighUnits || 'kg';
 

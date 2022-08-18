@@ -15,8 +15,6 @@ interface ISelectSection {
 
 export const SelectSection = ({ title, defaultValue, dropDownArray, handleSelect }: ISelectSection) => {
   const { themeColor } = useContext(ThemeContext);
-  console.log(defaultValue);
-
 
   const handleSelectHandler = useCallback((selectedItem: string) => {
     handleSelect(title === 'Color Schema' ? COLORS[selectedItem.replace(/\s+/g, '').toLowerCase() as 'burgundi' | 'veriperi'].value : selectedItem, title);

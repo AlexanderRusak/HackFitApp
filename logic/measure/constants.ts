@@ -3,7 +3,7 @@ export const HEIGHT = [
   'INCH'
 ];
 
-export const WEIGH = [
+export const WEIGHT = [
   'KG',
   'POUNDS'
 ]

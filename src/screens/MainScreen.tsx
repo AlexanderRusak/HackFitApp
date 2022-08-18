@@ -43,19 +43,19 @@ export const MainScreen = () => {
             }}
             name={Summary} component={SummaryScreen} />
         <BottomTabs.Screen
-                   options={{
-                       tabBarIcon: ({ color }) => <SimpleLineIcons name="graph" size={24} color={theme.colors.WHITE} />
-                   }}
+            options={{
+                tabBarIcon: ({ color }) => <SimpleLineIcons name="graph" size={24} color={theme.colors.WHITE} />
+            }}
             name={Graphs} component={GraphsScreen} />
         <BottomTabs.Screen
-                       options={{
-                           tabBarIcon: ({ color }) => <FontAwesome5 name="running" size={24} color={theme.colors.WHITE} />
-                       }}
+            options={{
+                tabBarIcon: ({ color }) => <FontAwesome5 name="running" size={24} color={theme.colors.WHITE} />
+            }}
             name={Workout} component={WorkoutScreen} />
         <BottomTabs.Screen
-                    options={{
-                        tabBarIcon: ({ color }) => <Fontisto name="player-settings" size={24} color={theme.colors.WHITE} />
-                    }}
+            options={{
+                tabBarIcon: ({ color }) => <Fontisto name="player-settings" size={24} color={theme.colors.WHITE} />
+            }}
             name={Settings} component={SettingsScreen} />
     </BottomTabs.Navigator>
 

@@ -3,17 +3,15 @@ import { View, Text } from "react-native"
 import { VictoryBar } from "victory-native"
 import { GraphMain } from "../../constants/interfaces/GraphMain"
 
-interface WeighGraphProps extends GraphMain{
-    
+interface WeightGraphProps extends GraphMain {
+
 }
 
 
 
-export const WeighGraph = ({ color }: WeighGraphProps) => {
-    console.log(color);
-    
+export const WeightGraph = ({ color }: WeightGraphProps) => {
     return <View>
-        <Text style={{ color: color }}>Weigh Graph</Text>
+        <Text style={{ color: color }}>Weight Graph</Text>
         <VictoryBar />
     </View>
 }

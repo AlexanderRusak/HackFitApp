@@ -3,74 +3,73 @@ import { useNavigation } from '@react-navigation/native'
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
 import { useSelector } from 'react-redux'
 import { Graphs } from '../../constants/screens/screens'
-import  { IStore } from '../../store'
+import { IStore } from '../../store'
 import { theme } from '../../styles/theme'
 import { Fonts, Icon } from '../ui/Icon/Icon';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 export interface SummarySectionProps {
   headerName: string,
   textValue: string,
-  type: string
+  sectionName: string
 }
 
 
-export const SummarySection = ({ textValue, headerName, type }: SummarySectionProps) => {
+export const SummarySection = ({ textValue, headerName, sectionName }: SummarySectionProps) => {
 
-  const navigation = useNavigation()
+  const navigation = useNavigation<NativeStackNavigationProp<any>>()
 
   const { color, energy } = useSelector((store: IStore) => store.settingsParameter);
   const { data } = useSelector((store: IStore) => store.bodyParameters)
 
   const sectionData = {
-    Lungs: {
-      font:'MaterialCommunityIcons' as keyof typeof Fonts,
-      name:'lungs',
+    Saturation: {
+      font: 'MaterialCommunityIcons' as keyof typeof Fonts,
+      name: 'lungs',
       unit: '%'
     },
     Calories: {
-      font:'MaterialCommunityIcons' as keyof typeof Fonts,
-      name:'food',
+      font: 'MaterialCommunityIcons' as keyof typeof Fonts,
+      name: 'food',
       unit: energy
     },
     Glucose: {
-      font:'Fontisto' as keyof typeof Fonts,
-      name:'blood-drop',
+      font: 'Fontisto' as keyof typeof Fonts,
+      name: 'blood-drop',
       unit: 'g/mmol'
     },
     Heart: {
-      font:'Fontisto' as keyof typeof Fonts,
-      name:'pulse',
+      font: 'Fontisto' as keyof typeof Fonts,
+      name: 'pulse',
       unit: 'BPM'
     },
-    Scales: {
-      font:'MaterialCommunityIcons' as keyof typeof Fonts,
-      name:'scale-bathroom',
+    Weight: {
+      font: 'MaterialCommunityIcons' as keyof typeof Fonts,
+      name: 'scale-bathroom',
       unit: data && data.length && data[data.length - 1].weighUnits
     },
     Steps: {
-      font:'MaterialCommunityIcons' as keyof typeof Fonts,
-      name:'walk',
+      font: 'MaterialCommunityIcons' as keyof typeof Fonts,
+      name: 'walk',
       unit: 'steps'
     },
   };
 
   const handlePress = () => {
-    navigation.navigate(Graphs as never, {
-      data: type
-    } as never)
+    navigation.navigate(Graphs, {
+      data: sectionName
+    })
   }
-
-
 
   return <TouchableOpacity onPress={handlePress} style={{ ...styles.container, backgroundColor: color }}>
     <View style={styles.headerBlock} >
       <View style={styles.textContainer}>
         <Text style={styles.headerName}>{headerName}</Text>
       </View>
-      <Icon size={50} iconFont={sectionData[type as keyof typeof sectionData].font} iconName={sectionData[type as keyof typeof sectionData].name}/>
+      <Icon size={50} iconFont={sectionData[sectionName as keyof typeof sectionData].font} iconName={sectionData[sectionName as keyof typeof sectionData].name} />
     </View>
     <View style={styles.dataBlock}>
-      <Text style={styles.text}>{textValue} {sectionData[type as keyof typeof sectionData].unit}</Text>
+      <Text style={styles.text}>{textValue} {sectionData[sectionName as keyof typeof sectionData].unit}</Text>
     </View>
   </TouchableOpacity>
 }
@@ -84,7 +83,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column'
   },
   headerBlock: {
-    height:'30%',
+    height: '30%',
     marginTop: 10,
     display: 'flex',
     flexDirection: 'row',

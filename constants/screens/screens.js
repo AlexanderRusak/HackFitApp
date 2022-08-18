@@ -5,5 +5,5 @@ export const Settings = 'settings';
 export const Workout = 'workout';
 export const Graphs = 'graphs';
 export const BodyParameters = 'Body Parameters';
-export const Weigh = 'Weigh';
+export const Weight = 'Weight';
 export const Height = 'Height';

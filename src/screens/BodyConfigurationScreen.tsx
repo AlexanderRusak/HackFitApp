@@ -58,7 +58,7 @@ export const BodyConfigurationScreen = ({ navigation }: any) => {
 
   const handleScreen = useCallback((nameScreen: string, data: number) => {
     bodyParametersState && navigation.navigate(nameScreen, {
-      isMeasuring: !!["Weigh", "Height"].find((name) => name === nameScreen),
+      isMeasuring: !!["Weight", "Height"].find((name) => name === nameScreen),
       type: nameScreen.toLowerCase(),
       data,
       bodyData: bodyParameters
@@ -71,7 +71,7 @@ export const BodyConfigurationScreen = ({ navigation }: any) => {
     <View style={styles.container}>
       <ButtonSection title='Age' defaultValue={bodyParametersState ? bodyParametersState.age : 0} handleScreen={handleScreen} />
       <SelectSection title='Sex' defaultValue={bodyParametersState?.sex || 'Not Set'} dropDownArray={['Male', 'Female']} handleSelect={handleSection} />
-      <ButtonSection title='Weigh' defaultValue={bodyParametersState ? bodyParametersState.weigh : 0} handleScreen={handleScreen} />
+      <ButtonSection title='Weight' defaultValue={bodyParametersState ? bodyParametersState.weight : 0} handleScreen={handleScreen} />
       <ButtonSection title='Height' defaultValue={bodyParametersState ? bodyParametersState.height : 0} handleScreen={handleScreen} />
     </View>
   );

@@ -3,7 +3,6 @@ import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { SummarySection } from '../../components/summary/SummarySection';
-import { imageType } from '../../constants/summary/summaryData';
 import { IStore } from '../../store';
 
 
@@ -11,11 +10,10 @@ export const SummaryScreen = () => {
 
   const { data } = useSelector((store: IStore) => store.bodyParameters);
 
-
   const saturationSection = useMemo(() => {
     return <SummarySection
       headerName='Saturation'
-      type={imageType.Lungs}
+      sectionName='Saturation'
       textValue={'98'}
     />
   }, []);
@@ -23,7 +21,7 @@ export const SummaryScreen = () => {
   const heartRateSection = useMemo(() => {
     return <SummarySection
       headerName='Heart Rate'
-      type={imageType.Heart}
+      sectionName='Heart'
       textValue={'180'}
     />
   }, [])
@@ -31,7 +29,7 @@ export const SummaryScreen = () => {
   const caloriesSection = useMemo(() => {
     return <SummarySection
       headerName='Calories'
-      type={imageType.Calories}
+      sectionName='Calories'
       textValue={'1000'}
     />
   }, []);
@@ -39,7 +37,7 @@ export const SummaryScreen = () => {
   const glucoseLevelSection = useMemo(() => {
     return <SummarySection
       headerName='Glucose Level'
-      type={imageType.Glucose}
+      sectionName='Glucose'
       textValue={'5.8'}
     />
   }, []);
@@ -47,7 +45,7 @@ export const SummaryScreen = () => {
   const stepsSection = useMemo(() => {
     return <SummarySection
       headerName='Steps'
-      type={imageType.Steps}
+      sectionName='Steps'
       textValue={'8000'}
     />
   }, []);
@@ -55,8 +53,8 @@ export const SummaryScreen = () => {
   const currentWeightSection = useMemo(() => {
     return <SummarySection
       headerName='Current Weight'
-      type={imageType.Scales}
-      textValue={data && data.length && data[data.length - 1]?.weigh?.toString() || ''}
+      sectionName='Weight'
+      textValue={data && data.length && data[data.length - 1]?.weight?.toString() || ''}
     />
   }, [data, data.length]);
 

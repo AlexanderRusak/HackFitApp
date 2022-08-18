@@ -12,7 +12,7 @@ export const initialBodyParameters: BodyParameters = {
   height: 0,
   heightUnits: 'CM',
   sex: '',
-  weigh: 0,
+  weight: 0,
   weighUnits: 'KG'
 
 }

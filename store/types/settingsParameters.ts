@@ -1,7 +1,7 @@
 export interface BodyParameters {
   age: number,
   sex: 'Male' | 'Female' | string,
-  weigh: number,
+  weight: number,
   height: number,
   dateTime: number,
   heightUnits: string,
