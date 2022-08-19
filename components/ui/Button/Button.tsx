@@ -8,16 +8,17 @@ import { theme } from '../../../styles/theme';
 interface ButtonProps {
   title: string,
   isDisabled?: boolean,
-  handlePress: () => void
+  handlePress: () => void,
 }
 
 
-export const Button = ({ title, handlePress, isDisabled = false }: ButtonProps) => {
+export const Button = ({ title, handlePress, isDisabled = false}: ButtonProps) => {
 
   const { themeColor } = useContext(ThemeContext)
 
   return <TouchableOpacity
-    style={{ ...styles.buttonContainer, backgroundColor: themeColor }}
+    disabled={isDisabled}
+    style={{ ...styles.buttonContainer,backgroundColor:isDisabled? '#ccc': themeColor, }}
     onPress={handlePress}
   >
     <Text style={styles.button}>{title}</Text>
@@ -29,8 +30,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '90%',
-    marginTop: 50,
+    width: '100%',
     height: 50,
     alignSelf: 'center',
   },

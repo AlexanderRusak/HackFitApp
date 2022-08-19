@@ -65,10 +65,12 @@ export const SettingsScreen = ({ navigation }: any) => {
   return (
     <View style={styles.container}>
       {selectSectionComponent}
+      <View style={styles.buttonContainer}>
       <Button
         handlePress={handlePress}
         title={'Configure body Parameters'}
       />
+      </View>
     </View>
   );
 }
@@ -77,6 +79,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.WHITE,
+  },
+  buttonContainer:{
+    marginTop:50,
+    width:'90%',
+    alignSelf:'center'
   },
   button: {
     color: theme.colors.WHITE,
