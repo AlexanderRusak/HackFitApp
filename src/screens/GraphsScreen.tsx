@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { ParamListBase, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { ParamListBase, RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StyleSheet, View, Text, Route } from 'react-native';
 import Swiper from 'react-native-swiper'
 import { ThemeContext } from '../../context/ThemeContext';
@@ -30,15 +30,14 @@ export const GraphsScreen = () => {
 
   const { params } = useRoute<RouteProp<Param, "ParamData">>();
   const { themeColor } = useContext(ThemeContext);
+  const isFocused = useIsFocused();
 
   const [index, setIndex] = useState<number>(0);
 
   useEffect(() => {
-    const grpaphIndex = graphs.findIndex((graph) => graph.name.includes(params.data));
-    console.log(grpaphIndex);
-    grpaphIndex
-    setIndex(grpaphIndex === graphs.length - 1 ? 0 : grpaphIndex );
-  });
+    const grpaphIndex = graphs.findIndex((graph) => graph.name.includes(params?.data));
+    setIndex(grpaphIndex !== -1 ? grpaphIndex : 0);
+  }, [isFocused, params]);
 
   const graphsComponent = graphs.map(graph => {
     const GraphElement = graph;
@@ -48,9 +47,9 @@ export const GraphsScreen = () => {
   });
 
   return (
-    <Swiper showsPagination={false} index={index+1} style={styles.wrapper} showsButtons={true}>
+    isFocused ? <Swiper showsPagination={false} index={index} style={styles.wrapper} showsButtons={true}>
       {graphsComponent}
-    </Swiper>
+    </Swiper> : null
 
   );
 }
