@@ -7,7 +7,7 @@ import { WeightGraph } from '../../components/graphs/WeighGraph';
 import { SaturationGraph } from '../../components/graphs/SaturationGraph';
 import { HeartrateGraph } from '../../components/graphs/HeartrateGraph';
 import { CaloriesGraph } from '../../components/graphs/CaloriesGraph';
-import { GlucoseGraph } from '../../components/graphs/Glucose';
+import { GlucoseGraph } from '../../components/graphs/GlucoseGraphs/Glucose';
 import { StepsGraph } from '../../components/graphs/StepsGraph';
 
 

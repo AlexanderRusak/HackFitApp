@@ -6,3 +6,9 @@ export const theme = {
   backNavigationFontSize: 16
 }
 
+export const graphColors={
+  yellow:'#FFCF48',
+  grey:'#cccc',
+  red:'#d11507'
+}
+
