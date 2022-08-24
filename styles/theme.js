@@ -8,7 +8,7 @@ export const theme = {
 
 export const graphColors={
   yellow:'#FFCF48',
-  grey:'#cccc',
+  grey:'#808080',
   red:'#d11507'
 }
 

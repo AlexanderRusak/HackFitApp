@@ -12,7 +12,7 @@ interface GraphLineProps {
 
 export const GraphLine = ({ color, data, value }: GraphLineProps) => {
 
-    const lineData = useMemo(() => getLineData({ array: data, value: value }), [data.length, data])
+    const lineData = useMemo(() => getLineData({ array: data, value: value }), [data.length, data]);
 
     return <VictoryLine
         style={{
