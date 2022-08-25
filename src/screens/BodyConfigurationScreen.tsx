@@ -51,11 +51,6 @@ export const BodyConfigurationScreen = ({ navigation }: any) => {
 
   }, [bodyParametersState, navigation]);
 
-  console.log(bodyParameters);
-
-
-
-
   const handleScreen = useCallback((nameScreen: string, data: number) => {
     bodyParametersState && navigation.navigate(nameScreen, {
       isMeasuring: !!["Weight", "Height"].find((name) => name === nameScreen),

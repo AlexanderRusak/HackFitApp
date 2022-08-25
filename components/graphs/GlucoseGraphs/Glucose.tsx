@@ -1,13 +1,11 @@
 import React, { useMemo } from "react"
 import { View, Text } from "react-native"
 import { useSelector } from "react-redux"
-import { VictoryArea, VictoryBar, VictoryChart, VictoryLine, VictoryScatter, VictoryStack } from "victory-native"
+import { VictoryArea, VictoryAxis, VictoryBar, VictoryChart, VictoryLine, VictoryScatter, VictoryTheme, } from "victory-native"
 import { GraphMain } from "../../../constants/interfaces/GraphMain"
 import { IStore } from "../../../store"
-import { graphColors, theme } from "../../../styles/theme"
-import { GraphArea } from "../../ui/Graph/GraphArea"
-import { GraphLine } from "../../ui/Graph/GraphLine"
-import { getAreaData, getLineData } from "../../ui/Graph/helpers"
+import { graphColors, theme } from "../../../styles/theme";
+import { getAreaData, getFormattedDate, getLineData } from "../../ui/Graph/helpers"
 
 
 interface Glucose extends GraphMain { }
@@ -17,14 +15,38 @@ export const GlucoseGraph = ({ color }: Glucose) => {
 
 
 
+    const { hours, minutes, day, month, year,formattedTime } = getFormattedDate(new Date());
+
     const data = [
-        { x: 0, y: 170 },
-        { x: 1, y: 200 },
-        { x: 2, y: 210 },
-        { x: 3, y: 180 },
-        { x: 4, y: 160 },
-        { x: 5, y: 70 }
+        { x: new Date(year, month, day, hours, minutes - 20), y: 85 },
+        { x: new Date(year, month, day, hours, minutes - 19), y: 78 },
+        { x: new Date(year, month, day, hours, minutes - 18), y: 74 },
+        { x: new Date(year, month, day, hours, minutes - 17), y: 114 },
+        { x: new Date(year, month, day, hours, minutes - 16), y: 110 },
+        { x: new Date(year, month, day, hours, minutes - 15), y: 115 },
+        { x: new Date(year, month, day, hours, minutes - 14), y: 105 },
+        { x: new Date(year, month, day, hours, minutes - 13), y: 100 },
+        { x: new Date(year, month, day, hours, minutes - 12), y: 155 },
+        { x: new Date(year, month, day, hours, minutes - 11), y: 150 },
+        { x: new Date(year, month, day, hours, minutes - 10), y: 180 },
+        { x: new Date(year, month, day, hours, minutes - 9), y: 176 },
+        { x: new Date(year, month, day, hours, minutes - 8), y: 175 },
+        { x: new Date(year, month, day, hours, minutes - 7), y: 170 }, 
+        { x: new Date(year, month, day, hours, minutes - 6), y: 200 },
+        { x: new Date(year, month, day, hours, minutes - 5), y: 65 },
+        { x: new Date(year, month, day, hours, minutes - 4), y: 200 },
+        { x: new Date(year, month, day, hours, minutes - 3), y: 210 },
+        { x: new Date(year, month, day, hours, minutes - 2), y: 180 },
+        { x: new Date(year, month, day, hours, minutes - 1), y: 160 },
+        { x: new Date(year, month, day, hours, minutes), y: 70 },
     ];
+
+    console.log(new Date(2022, 7, 25, 15, 25).toLocaleDateString());
+    console.log(new Date(2022, 7, 25));
+    console.log(new Date(2022, 7, 25));
+    console.log(new Date(2022, 7, 25));
+    console.log(new Date(2022, 7, 25));
+    console.log(new Date(2022, 7, 25));
 
     const maxRangeLine = useMemo(() => getLineData({ array: data, value: 200 }), [data]);
     const minLineRange = useMemo(() => getLineData({ array: data, value: 80 }), [data]);
@@ -35,14 +57,21 @@ export const GlucoseGraph = ({ color }: Glucose) => {
 
     return <View>
         <Text style={{ color: color }}>Glucose Graph</Text>
-        <Text>Current {data[data.length-1].y}</Text>
+        <Text>Current {data[data.length - 1].y} TIME: {formattedTime}</Text>
         <VictoryChart
-        scale={{
-            x:'time',
-            y:'linear'
-        }}
+            theme={VictoryTheme.material}
+            scale={{
+                x: 'time'
+            }}
             animate={true}
+            domain={{
+                x: [data[0].x, data[data.length - 1].x]
+            }}
         >
+            <VictoryAxis
+                tickFormat={(x) => new Date(x).getHours() + ':' + new Date(x).getMinutes()}
+
+            />
             <VictoryArea
                 style={{
                     data: {
@@ -94,6 +123,7 @@ export const GlucoseGraph = ({ color }: Glucose) => {
                 style={{ data: { fill: color } }}
                 size={5}
                 data={data}
+                labels={({ datum }) => datum.y}
             />
         </VictoryChart>
     </View>

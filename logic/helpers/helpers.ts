@@ -3,6 +3,8 @@ import { BodyParameters } from '../../store/types/settingsParameters';
 
 export const isPushToSetting = ({ age, height, sex, weight, heightUnits, weighUnits }: BodyParameters,
   navigation: (route: string) => void) => {
+  console.log(age, height, sex, weight, heightUnits, weighUnits );
+
   if (!(Boolean(age) && Boolean(height) && Boolean(weight) && Boolean(sex) && Boolean(weighUnits) && Boolean(heightUnits))) {
     navigation(BodyConfiguration);
   }
