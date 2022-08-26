@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ParamListBase, RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Text, Route } from 'react-native';
+import { StyleSheet, View, Text, Route, ActivityIndicator } from 'react-native';
 import Swiper from 'react-native-swiper'
 import { ThemeContext } from '../../context/ThemeContext';
 import { WeightGraph } from '../../components/graphs/WeighGraph';
@@ -47,7 +47,7 @@ export const GraphsScreen = () => {
   });
 
   return (
-    isFocused ? <Swiper showsPagination={false} index={index} style={styles.wrapper} showsButtons={true}>
+    isFocused ? <Swiper showsButtons={false} loadMinimalLoader={<ActivityIndicator />} showsPagination={false} index={index} style={styles.wrapper} >
       {graphsComponent}
     </Swiper> : null
 

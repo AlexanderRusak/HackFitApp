@@ -71,4 +71,4 @@ export const getFormattedDate = (time: number | Date, dateSeparator = '/', timeS
     };
 }
 
-const addZero = (value: number) => value >= 10 ? value : `0${value}`;
+export const addZero = (value: number) => value >= 10 ? value : `0${value}`;
