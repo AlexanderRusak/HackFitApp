@@ -47,7 +47,7 @@ export const GraphsScreen = () => {
   });
 
   return (
-    isFocused ? <Swiper showsButtons={false} loadMinimalLoader={<ActivityIndicator />} showsPagination={false} index={index} style={styles.wrapper} >
+    isFocused ? <Swiper horizontal={false} showsButtons={false} loadMinimalLoader={<ActivityIndicator />} showsPagination={false} index={index} style={styles.wrapper} >
       {graphsComponent}
     </Swiper> : null
 

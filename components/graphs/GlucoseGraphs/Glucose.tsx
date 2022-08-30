@@ -1,10 +1,10 @@
-import React, { useMemo } from "react"
+import React, { useMemo, useState } from "react"
 import { View, Text } from "react-native"
-import { useSelector } from "react-redux"
-import { VictoryArea, VictoryAxis, VictoryBar, VictoryChart, VictoryLine, VictoryScatter, VictoryTheme, VictoryZoomContainer, } from "victory-native"
+import { VictoryArea, VictoryAxis, VictoryBar, VictoryBrushContainer, VictoryChart, VictoryLine, VictoryScatter, VictoryTheme, VictoryZoomContainer, } from "victory-native"
 import { GraphMain } from "../../../constants/interfaces/GraphMain"
 import { IStore } from "../../../store"
 import { graphColors, theme } from "../../../styles/theme";
+import { DomainTuple } from "victory-core";
 import { addZero, getAreaData, getFormattedDate, getLineData } from "../../ui/Graph/helpers"
 
 
@@ -18,7 +18,7 @@ export const GlucoseGraph = ({ color }: Glucose) => {
     const { hours, minutes, day, month, year, formattedTime } = getFormattedDate(new Date());
 
     const data = [
-/*         { x: new Date(year, month, day, hours, minutes - 20), y: 85 },
+        { x: new Date(year, month, day, hours, minutes - 20), y: 85 },
         { x: new Date(year, month, day, hours, minutes - 19), y: 78 },
         { x: new Date(year, month, day, hours, minutes - 18), y: 74 },
         { x: new Date(year, month, day, hours, minutes - 17), y: 114 },
@@ -32,7 +32,7 @@ export const GlucoseGraph = ({ color }: Glucose) => {
         { x: new Date(year, month, day, hours, minutes - 9), y: 176 },
         { x: new Date(year, month, day, hours, minutes - 8), y: 175 },
         { x: new Date(year, month, day, hours, minutes - 7), y: 170 },
-        { x: new Date(year, month, day, hours, minutes - 6), y: 200 }, */
+        { x: new Date(year, month, day, hours, minutes - 6), y: 200 },
         { x: new Date(year, month, day, hours, minutes - 5), y: 65 },
         { x: new Date(year, month, day, hours, minutes - 4), y: 200 },
         { x: new Date(year, month, day, hours, minutes - 3), y: 210 },
@@ -48,12 +48,29 @@ export const GlucoseGraph = ({ color }: Glucose) => {
     const midRangeArea = useMemo(() => getAreaData({ array: data, maxValue: 200, minValue: 80 }), [data]);
 
 
+    const [zoomDomain, setZoomDomain] = useState({});
+    const [selectedDomain, setSelectedDomain] = useState({})
+
+    const handleZoom = (domain: any) => {
+        console.log(domain);
+        setSelectedDomain({ selectedDomain: domain });
+    }
+
+    const handleBrush = (domain: any) => {
+        console.log(domain);
+
+        setZoomDomain({ zoomDomain: domain });
+    }
+
+
+
     return <View>
         <Text style={{ color: color }}>Glucose Graph</Text>
         <Text>Current {data[data.length - 1].y} TIME: {formattedTime}</Text>
 
 
         <VictoryChart
+            height={300}
             theme={VictoryTheme.material}
             scale={{
                 x: 'time'
@@ -61,7 +78,16 @@ export const GlucoseGraph = ({ color }: Glucose) => {
             domain={{
                 x: [data[0].x, data[data.length - 1].x]
             }}
-            containerComponent={<VictoryZoomContainer />}
+            domainPadding={{
+                x: 15
+            }}
+            containerComponent={<VictoryZoomContainer
+                responsive={false}
+                zoomDimension='x'
+                zoomDomain={zoomDomain}
+                onZoomDomainChange={handleZoom}
+            />}
+
         >
             <VictoryAxis
                 crossAxis
@@ -121,6 +147,40 @@ export const GlucoseGraph = ({ color }: Glucose) => {
                 data={data}
                 labels={({ datum }) => datum.y}
             />
+        </VictoryChart>
+        <VictoryChart
+            theme={VictoryTheme.material}
+            height={90}
+            scale={{ x: 'time' }}
+            padding={{ top: 0, left: 50, right: 50, bottom: 30 }}
+            domain={{
+                x: [data[0].x, data[data.length - 1].x]
+            }}
+            domainPadding={{
+                x: 15
+            }}
+            containerComponent={
+                <VictoryBrushContainer
+                    responsive={false}
+                    brushDimension='x'
+                    brushDomain={selectedDomain}
+                    onBrushDomainChange={handleBrush}
+                />
+            }
+        >
+            <VictoryAxis
+                tickValues={[new Date(year, month, day, hours, minutes - 5),
+                new Date(year, month, day, hours, minutes - 4),
+                new Date(year, month, day, hours, minutes - 3),
+                new Date(year, month, day, hours, minutes - 2),
+                new Date(year, month, day, hours, minutes - 1),
+                new Date(year, month, day, hours, minutes),
+                ]}
+                tickFormat={(x) => addZero(new Date(x).getHours()) + ':' + addZero(new Date(x).getMinutes())}
+            />
+            <VictoryLine
+                style={{ data: { fill: color } }}
+                data={data} />
         </VictoryChart>
     </View>
 }
