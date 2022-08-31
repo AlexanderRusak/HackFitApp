@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react"
 import { View, Text } from "react-native"
-import { VictoryArea, VictoryAxis, VictoryBar, VictoryBrushContainer, VictoryChart, VictoryLine, VictoryScatter, VictoryTheme, VictoryZoomContainer, } from "victory-native"
+import { VictoryArea, VictoryAxis, VictoryBar, VictoryBrushContainer, VictoryChart, VictoryLabel, VictoryLine, VictoryScatter, VictoryTheme, VictoryZoomContainer, } from "victory-native"
 import { GraphMain } from "../../../constants/interfaces/GraphMain"
 import { IStore } from "../../../store"
 import { graphColors, theme } from "../../../styles/theme";
@@ -10,6 +10,13 @@ import { addZero, getAreaData, getFormattedDate, getLineData } from "../../ui/Gr
 
 interface Glucose extends GraphMain { }
 
+/* export interface DomainTuple {
+    x: Date | number; y: number
+}
+ */
+interface BrushDomain {
+    x: DomainTuple
+}
 
 export const GlucoseGraph = ({ color }: Glucose) => {
 
@@ -41,29 +48,23 @@ export const GlucoseGraph = ({ color }: Glucose) => {
         { x: new Date(year, month, day, hours, minutes), y: 70 },
     ];
 
-    const maxRangeLine = useMemo(() => getLineData({ array: data, value: 200 }), [data]);
-    const minLineRange = useMemo(() => getLineData({ array: data, value: 80 }), [data]);
     const maxRangeArea = useMemo(() => getAreaData({ array: data, maxValue: 250, minValue: 200 }), [data]);
     const minRangeArea = useMemo(() => getAreaData({ array: data, maxValue: 80, minValue: 0 }), [data]);
     const midRangeArea = useMemo(() => getAreaData({ array: data, maxValue: 200, minValue: 80 }), [data]);
 
+    const initialZoom = [...data].splice(-5);
+    const initialDomain: BrushDomain = { x: [initialZoom[0].x, initialZoom[initialZoom.length - 1].x] }
 
-    const [zoomDomain, setZoomDomain] = useState({});
-    const [selectedDomain, setSelectedDomain] = useState({})
+    const [zoomDomain, setZoomDomain] = useState<BrushDomain | DomainTuple>(initialDomain);
+    const [selectedDomain, setSelectedDomain] = useState(initialDomain)
 
-    const handleZoom = (domain: any) => {
-        console.log(domain);
-        setSelectedDomain({ selectedDomain: domain });
+    const handleZoom = (selectedDomain: BrushDomain) => {
+        setSelectedDomain(selectedDomain);
     }
 
-    const handleBrush = (domain: any) => {
-        console.log(domain);
-
-        setZoomDomain({ zoomDomain: domain });
+    const handleBrush = (zoomDomain: BrushDomain) => {
+        setZoomDomain(zoomDomain);
     }
-
-
-
     return <View>
         <Text style={{ color: color }}>Glucose Graph</Text>
         <Text>Current {data[data.length - 1].y} TIME: {formattedTime}</Text>
@@ -75,16 +76,10 @@ export const GlucoseGraph = ({ color }: Glucose) => {
             scale={{
                 x: 'time'
             }}
-            domain={{
-                x: [data[0].x, data[data.length - 1].x]
-            }}
-            domainPadding={{
-                x: 15
-            }}
             containerComponent={<VictoryZoomContainer
                 responsive={false}
                 zoomDimension='x'
-                zoomDomain={zoomDomain}
+                zoomDomain={zoomDomain as BrushDomain}
                 onZoomDomainChange={handleZoom}
             />}
 
@@ -92,7 +87,6 @@ export const GlucoseGraph = ({ color }: Glucose) => {
             <VictoryAxis
                 crossAxis
                 tickFormat={(x) => addZero(new Date(x).getHours()) + ':' + addZero(new Date(x).getMinutes())}
-
             />
             <VictoryArea
                 style={{
@@ -104,15 +98,7 @@ export const GlucoseGraph = ({ color }: Glucose) => {
                 data={maxRangeArea}
 
             />
-            <VictoryLine
-                style={{
-                    data: {
-                        stroke: graphColors.yellow,
-                        strokeWidth: 3
-                    }
-                }}
-                data={maxRangeLine}
-            />
+
 
             <VictoryArea
                 style={{
@@ -133,14 +119,7 @@ export const GlucoseGraph = ({ color }: Glucose) => {
                 }}
                 data={minRangeArea}
             />
-            <VictoryLine
-                style={{
-                    data: {
-                        stroke: graphColors.red
-                    }
-                }}
-                data={minLineRange}
-            />
+
             <VictoryScatter
                 style={{ data: { fill: color } }}
                 size={5}
@@ -154,11 +133,11 @@ export const GlucoseGraph = ({ color }: Glucose) => {
             scale={{ x: 'time' }}
             padding={{ top: 0, left: 50, right: 50, bottom: 30 }}
             domain={{
-                x: [data[0].x, data[data.length - 1].x]
+                x: [maxRangeArea[0].x, maxRangeArea[maxRangeArea.length - 1].x],
+                y: [0, 250]
             }}
-            domainPadding={{
-                x: 15
-            }}
+
+
             containerComponent={
                 <VictoryBrushContainer
                     responsive={false}
@@ -169,18 +148,14 @@ export const GlucoseGraph = ({ color }: Glucose) => {
             }
         >
             <VictoryAxis
-                tickValues={[new Date(year, month, day, hours, minutes - 5),
-                new Date(year, month, day, hours, minutes - 4),
-                new Date(year, month, day, hours, minutes - 3),
-                new Date(year, month, day, hours, minutes - 2),
-                new Date(year, month, day, hours, minutes - 1),
-                new Date(year, month, day, hours, minutes),
-                ]}
+                crossAxis
                 tickFormat={(x) => addZero(new Date(x).getHours()) + ':' + addZero(new Date(x).getMinutes())}
             />
             <VictoryLine
+                interpolation={'step'}
                 style={{ data: { fill: color } }}
                 data={data} />
+
         </VictoryChart>
     </View>
 }

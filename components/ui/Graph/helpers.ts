@@ -1,10 +1,11 @@
+import { DomainTuple } from "victory-core";
 
 interface DataProps {
     array: any[],
 }
 
 interface AreaLineProps extends DataProps {
-    value: number
+    value: DomainTuple
 }
 
 interface AreaDataProps extends DataProps {
@@ -12,20 +13,17 @@ interface AreaDataProps extends DataProps {
     maxValue: number,
 }
 
-
-export const getAreaData = ({ array, minValue, maxValue }: AreaDataProps) => {
+export const getAreaData = ({ array, minValue, maxValue }: AreaDataProps): DomainTuple[] => {
     const initArray = Array(array.length);
-    for (let i = 0; i < initArray.length; i++) {        
+    for (let i = 0; i < initArray.length; i++) {
         initArray[i] = {
             x: array[i].x,
             y0: minValue,
             y: maxValue,
         }
     }
-
     return initArray
 }
-
 
 export const getLineData = ({ array, value }: AreaLineProps) => {
     const initArray = Array(array.length);
