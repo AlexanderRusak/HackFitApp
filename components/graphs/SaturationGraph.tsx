@@ -1,9 +1,13 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { View, Text, StyleSheet } from "react-native"
-import { VictoryChart, VictoryLine, VictoryTheme } from "victory-native"
+import { VictoryAxis, VictoryChart, VictoryLine, VictoryTheme, VictoryZoomContainer } from "victory-native"
 import { GraphMain } from "../../constants/interfaces/GraphMain"
 import { Button } from "../ui/Button/Button"
-
+import { addZero, getFormattedDate } from "../ui/Graph/helpers"
+import { BrushComponent } from "./GraphsComponent/BrushComponent"
+import { BrushDomain } from "./GlucoseGraphs/Glucose"
+import { DomainTuple } from "victory-core";
+import { HeaderComponent } from "./GraphsComponent/HeaderComponent"
 interface SaturationGraphProps extends GraphMain {
 
 }
@@ -11,79 +15,57 @@ interface SaturationGraphProps extends GraphMain {
 
 export const SaturationGraph = ({ color }: SaturationGraphProps) => {
 
+    const { hours, minutes, day, month, year, formattedTime } = useMemo(() => getFormattedDate(new Date()), []);
+
     const initData = [
-        { x: '09.54', y: 97.5 },
-        { x: '09.59', y: 97 },
-        { x: '10.20', y: 96.5 },
-        { x: '10.34', y: 96 },
-        { x: '11.02', y: 98 },
-        { x: '11.15', y: 97.5 },
-        { x: '11.44', y: 97 },
-        { x: '11.58', y: 96.5 },
-        { x: '12.02', y: 96.5 },
-        { x: '12.20', y: 97 },
-        { x: '12.31', y: 98 },
-        { x: '12.55', y: 95.5 },
-        { x: '13.18', y: 96 },
-        { x: '13.54', y: 98 },
-        { x: '13.55', y: 95.5 },
-        { x: '14.15', y: 97 },
-        { x: '14.40', y: 96 },
-        { x: '15.00', y: 97 }
+        { x: new Date(year, month, day, hours, minutes - 85), y: 97.5 },
+        { x: new Date(year, month, day, hours, minutes - 80), y: 97 },
+        { x: new Date(year, month, day, hours, minutes - 75), y: 96.5 },
+        { x: new Date(year, month, day, hours, minutes - 70), y: 96 },
+        { x: new Date(year, month, day, hours, minutes - 65), y: 98 },
+        { x: new Date(year, month, day, hours, minutes - 60), y: 97.5 },
+        { x: new Date(year, month, day, hours, minutes - 55), y: 97 },
+        { x: new Date(year, month, day, hours, minutes - 50), y: 96.5 },
+        { x: new Date(year, month, day, hours, minutes - 45), y: 96.5 },
+        { x: new Date(year, month, day, hours, minutes - 40), y: 97 },
+        { x: new Date(year, month, day, hours, minutes - 35), y: 98 },
+        { x: new Date(year, month, day, hours, minutes - 30), y: 95.5 },
+        { x: new Date(year, month, day, hours, minutes - 25), y: 96 },
+        { x: new Date(year, month, day, hours, minutes - 20), y: 98 },
+        { x: new Date(year, month, day, hours, minutes - 15), y: 95.5 },
+        { x: new Date(year, month, day, hours, minutes - 10), y: 97 },
+        { x: new Date(year, month, day, hours, minutes - 5), y: 96 },
+        { x: new Date(year, month, day, hours, minutes), y: 97.9 }
     ];
 
-    const [currentRange, setCurrentRange] = useState(5);
-    const [saturationData, setSaturationData] = useState(initData.slice(initData.length - currentRange));
 
+    const initialZoom = useMemo(() => [...initData].splice(-5), [initData]);
+    const initialDomain: BrushDomain = { x: [initialZoom[0].x, initialZoom[initialZoom.length - 1].x] }
 
+    const [zoomDomain, setZoomDomain] = useState<BrushDomain | DomainTuple>(initialDomain);
+    const [selectedDomain, setSelectedDomain] = useState<BrushDomain | DomainTuple>(initialDomain);
 
-    useEffect(() => {
-        setSaturationData(initData.slice(initData.length - currentRange))
-    }, [currentRange])
+    const handleZoom = (selectedDomain: BrushDomain) => {
+        console.log(selectedDomain);
 
+        setSelectedDomain(selectedDomain);
+    }
 
+    const handleBrush = (zoomDomain: BrushDomain) => {
+        setZoomDomain(zoomDomain);
+    }
 
-
-
-    const handleDecreaseRange = useCallback(() => {
-        setCurrentRange(currentRange - 1);
-    }, [currentRange]);
-
-    const handleIncreaseRange = useCallback(() => {
-        setCurrentRange(currentRange + 1);
-
-    }, [currentRange]);
-
-    useEffect(() => { 
-        const intervalId = setInterval(() => {  //assign interval to a variable to clear it.
-            setSaturationData([...initData, { x: '15.55', y: 97.5 }].slice(initData.length - currentRange+ 1 ))
-        }, 5000)
-
-        return () => clearInterval(intervalId); //This is important
-
-    }, [setCurrentRange])
 
 
 
     return <View>
-        <Text style={{ color: color }}>Saturation Graph</Text>
-        <View style={styles.buttonsContainer}>
-            <View style={styles.buttons}>
-                <Button
-                    isDisabled={currentRange <= 5}
-                    title="-"
-                    handlePress={handleDecreaseRange}
-                />
-            </View>
-            <View style={styles.buttons}>
-                <Button
-                    isDisabled={initData.length <= currentRange}
-                    title="+"
-                    handlePress={handleIncreaseRange}
-                />
-            </View>
-        </View>
-        <Text style={{ color: color }}>Current value {initData[initData.length - 1].y}</Text>
+        <HeaderComponent
+            currentValue={initData[initData.length - 1].y}
+            headerTitle={'Saturation Graph'}
+            lastMeasure={formattedTime}
+            measuringUnit={'%'}
+        />
+
         <VictoryChart
             maxDomain={{
                 y: 99,
@@ -91,35 +73,51 @@ export const SaturationGraph = ({ color }: SaturationGraphProps) => {
             minDomain={{
                 y: 94
             }}
-            height={500}
-            animate={{
-                duration: 500,
-                onLoad: { duration: 500 }
-            }}
+            height={400}
             theme={VictoryTheme.material}
+            scale={{
+                x: 'time',
+            }}
+            
+            containerComponent={<VictoryZoomContainer
+                responsive={false}
+                zoomDimension='x'
+                zoomDomain={zoomDomain as BrushDomain}
+                onZoomDomainChange={handleZoom}
+            />
+        }
         >
             <VictoryLine
-
+                labels={({ datum }) => datum.y}
                 style={{
-                    data: { stroke: "#c43a31" },
+                    data: { stroke: color },
                     parent: { border: "1px solid #ccc" }
                 }}
-                data={saturationData}
+                domainPadding={{
+                    x: 20
+                }}
+                data={initData}
                 interpolation="natural"
 
             />
+            <VictoryAxis
+                crossAxis
+                tickFormat={(x) => addZero(new Date(x).getHours()) + ':' + addZero(new Date(x).getMinutes())}
+            />
         </VictoryChart>
+
+        <BrushComponent
+            brushDomain={selectedDomain as BrushDomain}
+            onBrushDomainChange={handleBrush}
+            rangeX={[+initData[0].x, +initData[initData.length - 1].x]}
+            rangeY={[94, 99]}
+            data={initData}
+            color={color}
+            interpolationType={'natural'}
+        />
     </View>
 }
 
 const styles = StyleSheet.create({
-    buttonsContainer: {
-        width: 120,
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between'
-    },
-    buttons: {
-        width: 50
-    }
+
 })

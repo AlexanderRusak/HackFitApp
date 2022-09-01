@@ -13,7 +13,7 @@ interface AreaDataProps extends DataProps {
     maxValue: number,
 }
 
-export const getAreaData = ({ array, minValue, maxValue }: AreaDataProps): DomainTuple[] => {
+export const getAreaData = ({ array, minValue, maxValue }: AreaDataProps)=> {
     const initArray = Array(array.length);
     for (let i = 0; i < initArray.length; i++) {
         initArray[i] = {

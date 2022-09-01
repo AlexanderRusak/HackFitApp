@@ -1,26 +1,24 @@
-import React, { useMemo, useState } from "react"
-import { View, Text } from "react-native"
+import React, { useEffect, useMemo, useState } from "react"
+import { View, Text, StyleSheet } from "react-native"
 import { VictoryArea, VictoryAxis, VictoryBar, VictoryBrushContainer, VictoryChart, VictoryLabel, VictoryLine, VictoryScatter, VictoryTheme, VictoryZoomContainer, } from "victory-native"
 import { GraphMain } from "../../../constants/interfaces/GraphMain"
 import { IStore } from "../../../store"
 import { graphColors, theme } from "../../../styles/theme";
 import { DomainTuple } from "victory-core";
 import { addZero, getAreaData, getFormattedDate, getLineData } from "../../ui/Graph/helpers"
+import { BrushComponent } from "../GraphsComponent/BrushComponent"
+import { HeaderComponent } from "../GraphsComponent/HeaderComponent"
 
 
 interface Glucose extends GraphMain { }
 
-/* export interface DomainTuple {
-    x: Date | number; y: number
-}
- */
-interface BrushDomain {
+
+
+export interface BrushDomain {
     x: DomainTuple
 }
 
 export const GlucoseGraph = ({ color }: Glucose) => {
-
-
 
     const { hours, minutes, day, month, year, formattedTime } = getFormattedDate(new Date());
 
@@ -52,11 +50,11 @@ export const GlucoseGraph = ({ color }: Glucose) => {
     const minRangeArea = useMemo(() => getAreaData({ array: data, maxValue: 80, minValue: 0 }), [data]);
     const midRangeArea = useMemo(() => getAreaData({ array: data, maxValue: 200, minValue: 80 }), [data]);
 
-    const initialZoom = [...data].splice(-5);
+    const initialZoom = useMemo(() => [...data].splice(-5), [data]);
     const initialDomain: BrushDomain = { x: [initialZoom[0].x, initialZoom[initialZoom.length - 1].x] }
 
     const [zoomDomain, setZoomDomain] = useState<BrushDomain | DomainTuple>(initialDomain);
-    const [selectedDomain, setSelectedDomain] = useState(initialDomain)
+    const [selectedDomain, setSelectedDomain] = useState<BrushDomain | DomainTuple>(initialDomain);
 
     const handleZoom = (selectedDomain: BrushDomain) => {
         setSelectedDomain(selectedDomain);
@@ -65,10 +63,14 @@ export const GlucoseGraph = ({ color }: Glucose) => {
     const handleBrush = (zoomDomain: BrushDomain) => {
         setZoomDomain(zoomDomain);
     }
-    return <View>
-        <Text style={{ color: color }}>Glucose Graph</Text>
-        <Text>Current {data[data.length - 1].y} TIME: {formattedTime}</Text>
 
+    return <View style={styles.container}>
+        <HeaderComponent
+        currentValue={data[data.length - 1].y}
+        headerTitle={'Glucose Graph'}
+        lastMeasure={formattedTime}
+        measuringUnit={'g/mmol'}
+        />
 
         <VictoryChart
             height={300}
@@ -125,37 +127,28 @@ export const GlucoseGraph = ({ color }: Glucose) => {
                 size={5}
                 data={data}
                 labels={({ datum }) => datum.y}
+                domainPadding={{
+                    x: 15
+                }}
             />
         </VictoryChart>
-        <VictoryChart
-            theme={VictoryTheme.material}
-            height={90}
-            scale={{ x: 'time' }}
-            padding={{ top: 0, left: 50, right: 50, bottom: 30 }}
-            domain={{
-                x: [maxRangeArea[0].x, maxRangeArea[maxRangeArea.length - 1].x],
-                y: [0, 250]
-            }}
-
-
-            containerComponent={
-                <VictoryBrushContainer
-                    responsive={false}
-                    brushDimension='x'
-                    brushDomain={selectedDomain}
-                    onBrushDomainChange={handleBrush}
-                />
-            }
-        >
-            <VictoryAxis
-                crossAxis
-                tickFormat={(x) => addZero(new Date(x).getHours()) + ':' + addZero(new Date(x).getMinutes())}
-            />
-            <VictoryLine
-                interpolation={'step'}
-                style={{ data: { fill: color } }}
-                data={data} />
-
-        </VictoryChart>
+        <BrushComponent
+            data={data}
+            color={color}
+            rangeX={[maxRangeArea[0].x, maxRangeArea[maxRangeArea.length - 1].x]}
+            rangeY={[0, 250]}
+            brushDomain={selectedDomain as BrushDomain}
+            onBrushDomainChange={handleBrush}
+            interpolationType='step'
+        />
     </View>
 }
+
+const styles = StyleSheet.create({
+    container: {
+        display: 'flex',
+        height: '100%',
+        padding: theme.padding,
+        alignItems: 'center'
+    },
+})
