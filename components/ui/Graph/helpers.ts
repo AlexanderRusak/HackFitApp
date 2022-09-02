@@ -1,7 +1,13 @@
 import { DomainTuple } from "victory-core";
+import { Calories, Range } from "../../../constants/interfaces/GraphMain";
+import { converceNutritionToCalories } from "../../../logic/measure/measure.helper";
 
+export type Nutrition = 'carbs' | 'prots' | 'fats';
 interface DataProps {
     array: any[],
+}
+interface DataCaloriesProps {
+    array: Calories[],
 }
 
 interface AreaLineProps extends DataProps {
@@ -13,7 +19,10 @@ interface AreaDataProps extends DataProps {
     maxValue: number,
 }
 
-export const getAreaData = ({ array, minValue, maxValue }: AreaDataProps)=> {
+
+
+
+export const getAreaData = ({ array, minValue, maxValue }: AreaDataProps) => {
     const initArray = Array(array.length);
     for (let i = 0; i < initArray.length; i++) {
         initArray[i] = {
@@ -23,6 +32,16 @@ export const getAreaData = ({ array, minValue, maxValue }: AreaDataProps)=> {
         }
     }
     return initArray
+};
+
+export const getCaloriesAreaData = ({ array }: DataCaloriesProps): [Range[], Range[], Range[]] => {
+    const initArray = Array(array.length);
+    return array.reduce((prev, { x, y }) => {
+        const carbsMax = converceNutritionToCalories('carbs', y['carbs']);
+        const protsMax = converceNutritionToCalories('prots', y['prots']);
+        const fatsMax = converceNutritionToCalories('fats', y['fats']);
+        return [[...prev[0], { x, y: carbsMax, y0: 0 }], [...prev[1], { x, y: carbsMax + fatsMax, y0: carbsMax }], [...prev[2], { x, y: carbsMax + fatsMax + protsMax, y0: carbsMax + fatsMax }]]
+    }, [[] as Range[], [] as Range[], [] as Range[]]);
 }
 
 export const getLineData = ({ array, value }: AreaLineProps) => {
@@ -33,7 +52,6 @@ export const getLineData = ({ array, value }: AreaLineProps) => {
             y: value,
         }
     }
-
     return initArray
 }
 
