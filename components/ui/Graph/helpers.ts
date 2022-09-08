@@ -1,8 +1,8 @@
 import { DomainTuple } from "victory-core";
 import { Calories, Range } from "../../../constants/interfaces/GraphMain";
-import { converceNutritionToCalories } from "../../../logic/measure/measure.helper";
+import { converceNutritionToCalories, DefaultCaroliesValues, getDefaultNutririonValues, getFloorValue } from "../../../logic/measure/measure.helper";
 
-export type Nutrition = 'carbs' | 'prots' | 'fats';
+export type NutritionNames = 'carbs' | 'prots' | 'fats';
 interface DataProps {
     array: any[],
 }
@@ -19,6 +19,28 @@ interface AreaDataProps extends DataProps {
     maxValue: number,
 }
 
+interface PieData {
+    y: number;
+}
+
+interface PieDataProteins extends PieData {
+    x: 'Proteins'
+}
+
+interface PieDataFats extends PieData {
+    x: 'Fats'
+}
+
+interface PieDataCarbs extends PieData {
+    x: 'Carbs'
+}
+export type PieDataType = [
+    PieDataCarbs,
+    PieDataFats,
+    PieDataProteins
+]
+
+
 
 
 
@@ -34,15 +56,25 @@ export const getAreaData = ({ array, minValue, maxValue }: AreaDataProps) => {
     return initArray
 };
 
+export const getSingleLineData = (data: Calories[], duration: number): { x: Date, y: number }[] => {
+    return data.slice(-duration).reduce((prevValue, { x, y }) => {
+        return [
+            ...prevValue,
+            {
+                x,
+                y: y.dailyCaloriesLimit
+            }
+        ]
+    }, [] as any[]);
+}
+
 export const getCaloriesAreaData = ({ array }: DataCaloriesProps): [Range[], Range[], Range[]] => {
-    const initArray = Array(array.length);
-    return array.reduce((prev, { x, y }) => {
-        const carbsMax = converceNutritionToCalories('carbs', y['carbs']);
-        const protsMax = converceNutritionToCalories('prots', y['prots']);
-        const fatsMax = converceNutritionToCalories('fats', y['fats']);
+    return array.reduce((prev, { x, y: nutritionData }) => {
+        const { carbs: carbsMax, fats: fatsMax, prots: protsMax } = converceNutritionToCalories(nutritionData);
         return [[...prev[0], { x, y: carbsMax, y0: 0 }], [...prev[1], { x, y: carbsMax + fatsMax, y0: carbsMax }], [...prev[2], { x, y: carbsMax + fatsMax + protsMax, y0: carbsMax + fatsMax }]]
     }, [[] as Range[], [] as Range[], [] as Range[]]);
 }
+
 
 export const getLineData = ({ array, value }: AreaLineProps) => {
     const initArray = Array(array.length);
@@ -53,7 +85,49 @@ export const getLineData = ({ array, value }: AreaLineProps) => {
         }
     }
     return initArray
+};
+
+export const getPieData = (data: Calories[], duration: number = 1): PieDataType => {
+
+    const initData: PieDataType = [
+        {
+            x: 'Carbs',
+            y: 0,
+        },
+        {
+            x: 'Fats',
+            y: 0,
+        },
+        {
+            x: 'Proteins',
+            y: 0,
+        }]
+
+
+
+    return data.slice(-duration).reduce((prev, { y: nutritionData }): PieDataType => {
+        const { carbs, fats, prots } = converceNutritionToCalories(nutritionData);
+        const caloriesSum = nutritionData.dailyCaloriesLimit;
+        const { carbs: carbsDefault, fats: fatsDefault, prots: protsDefault } = getDefaultNutririonValues(caloriesSum);
+        const actuallycalories = carbs + fats + prots;
+        return [
+            {
+                x: 'Carbs',
+                y: getFloorValue((prev[0].y / 100), carbs, carbsDefault, actuallycalories, nutritionData.dailyCaloriesLimit, 'carbs', duration),
+            },
+            {
+                x: 'Fats',
+                y: getFloorValue((prev[1].y / 100), fats, fatsDefault, actuallycalories, nutritionData.dailyCaloriesLimit, 'fats', duration),
+            },
+            {
+                x: 'Proteins',
+                y: getFloorValue((prev[2].y / 100), prots, protsDefault, actuallycalories, nutritionData.dailyCaloriesLimit, 'prots', duration),
+            }
+        ]
+    }, initData);
 }
+
+
 
 
 export const getFormattedDate = (time: number | Date, dateSeparator = '/', timeSeparator = ':'): {

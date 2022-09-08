@@ -1,15 +1,16 @@
 import React, { useMemo, useState } from "react"
 import { View, Text, StyleSheet } from "react-native"
 import { useSelector } from "react-redux"
-import { VictoryArea, VictoryChart, VictoryPie, VictoryTheme, VictoryZoomContainer } from "victory-native"
+import { VictoryArea, VictoryAxis, VictoryChart, VictoryLine, VictoryPie, VictoryTheme, VictoryZoomContainer } from "victory-native"
 import { Calories, GraphMain } from "../../constants/interfaces/GraphMain"
 import { IStore } from "../../store"
 import { theme } from "../../styles/theme"
-import { getCaloriesAreaData, getFormattedDate } from "../ui/Graph/helpers"
+import { getCaloriesAreaData, getFormattedDate, getLineData, getPieData, getSingleLineData, PieDataType } from "../ui/Graph/helpers"
 import { BrushDomain } from "./GlucoseGraphs/Glucose"
 import { BrushComponent } from "./GraphsComponent/BrushComponent"
 import { HeaderComponent } from "./GraphsComponent/HeaderComponent"
 import { DomainTuple } from "victory-core";
+import { converceNutritionToCalories } from "../../logic/measure/measure.helper"
 
 interface CaloriesGraphProps extends GraphMain { }
 
@@ -40,93 +41,76 @@ export const CaloriesGraph = ({ }: CaloriesGraphProps) => {
             x: new Date(year, month, day - 5),
             y: {
                 dailyCaloriesLimit: 3000,
-                prots: 200,
                 carbs: 90,
                 fats: 150,
+                prots: 200,
             }
         },
         {
             x: new Date(year, month, day - 4),
             y: {
                 dailyCaloriesLimit: 3000,
-                prots: 220,
                 carbs: 110,
                 fats: 180,
+                prots: 220,
             }
         },
         {
             x: new Date(year, month, day - 3),
             y: {
                 dailyCaloriesLimit: 3000,
-                prots: 290,
                 carbs: 120,
                 fats: 170,
+                prots: 290,
             }
         },
         {
             x: new Date(year, month, day - 2),
             y: {
                 dailyCaloriesLimit: 3000,
-                prots: 150,
                 carbs: 50,
                 fats: 200,
+                prots: 150,
             }
         },
         {
             x: new Date(year, month, day - 1),
             y: {
                 dailyCaloriesLimit: 3000,
-                prots: 190,
                 carbs: 150,
                 fats: 160,
+                prots: 190,
             }
         },
         {
             x: new Date(year, month, day),
             y: {
                 dailyCaloriesLimit: 3000,
-                prots: 210,
-                carbs: 200,
+                carbs: 90,
                 fats: 180,
+                prots: 210,
             }
         },
     ]
 
     const [carbs, fats, prots] = useMemo(() => getCaloriesAreaData({ array: initData }), [initData]);
-    console.log(carbs, fats, prots);
+    const pieData: PieDataType = useMemo(() => getPieData(initData, 1), [initData]);
 
-
-    const data =
-        [
-            {
-
-                y: 40,
-                x: "Proteins"
-            },
-            {
-
-                y: 15,
-                x: "Carbs"
-            },
-            {
-
-                y: 45,
-                x: "Fats"
-            }
-        ]
+    const lineData = useMemo(() => getSingleLineData(initData, 6), [initData]);
+    console.log(lineData);
 
 
     return <View style={styles.container}>
         <HeaderComponent
-            currentValue={3000}
+            currentValue={initData[initData.length - 1].y.dailyCaloriesLimit}
             headerTitle={'Calories Graph'}
             measuringUnit={energy}
         />
         <View style={styles.graphsContainer}>
             <VictoryChart
-            domain={{
-                y:[0,3200]
-            }}
+                domain={{
+                    y: [0, 3300]
+                }}
                 height={250}
                 theme={VictoryTheme.material}
                 scale={{
@@ -138,38 +122,51 @@ export const CaloriesGraph = ({ }: CaloriesGraphProps) => {
                     zoomDomain={zoomDomain as BrushDomain}
                     onZoomDomainChange={handleZoom}
                 />}
+
             >
                 <VictoryArea
                     data={carbs}
+                    interpolation={'stepBefore'}
                     style={{
-                        data:{
-                            fill:'navy'
+                        data: {
+                            fill: 'navy'
                         }
                     }}
                 />
                 <VictoryArea
+                    interpolation={'stepBefore'}
                     data={fats}
                     style={{
-                        data:{
-                            fill:'orange'
+                        data: {
+                            fill: 'orange'
                         }
                     }}
                 />
                 <VictoryArea
+                    labels={({datum}) => datum.y}
+                    interpolation={'stepBefore'}
                     data={prots}
                     style={{
-                        data:{
-                            fill:'pink'
+                        data: {
+                            fill: 'pink',
+                        },
+                        labels:{
+                            alignSelf:'center'
                         }
                     }}
+                />
+                <VictoryLine
+                    data={lineData}
+                    style={{ data: { stroke: color }, }}
+
                 />
             </VictoryChart>
             <View style={styles.pieContainer}>
                 <VictoryPie
-                    height={200}
-                    width={200}
-                    data={data}
-                    colorScale={["pink", "navy", "orange",]}
+                    height={250}
+                    width={250}
+                    data={pieData}
+                    colorScale={["navy", "orange", "pink",]}
                     labels={({ datum }) => `${datum.y}%`}
                     labelRadius={15}
                     labelPlacement={() => 'parallel'}
@@ -183,9 +180,9 @@ export const CaloriesGraph = ({ }: CaloriesGraphProps) => {
                     }}
                 />
                 <View>
-                    <Text>1</Text>
-                    <Text>2</Text>
-                    <Text>3</Text>
+                    <Text>Carbs: {pieData[0].y}%</Text>
+                    <Text>Fats: {pieData[1].y}%</Text>
+                    <Text>Prots: {pieData[2].y}%</Text>
                 </View>
             </View>
         </View>
@@ -215,7 +212,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        height: '30%',
+        height: '35%',
         backgroundColor: 'red'
     }
 })
