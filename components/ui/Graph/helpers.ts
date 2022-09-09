@@ -41,7 +41,7 @@ export type PieDataType = [
 ]
 
 
-
+export const dayInMs = 86400000;
 
 
 export const getAreaData = ({ array, minValue, maxValue }: AreaDataProps) => {
@@ -57,11 +57,12 @@ export const getAreaData = ({ array, minValue, maxValue }: AreaDataProps) => {
 };
 
 export const getSingleLineData = (data: Calories[], duration: number): { x: Date, y: number }[] => {
-    return data.slice(-duration).reduce((prevValue, { x, y }) => {
+    return data.slice(-duration).reduce((prevValue, { x, y }, index, arr) => {
         return [
+
             ...prevValue,
             {
-                x,
+                x: index === 0 ? new Date(new Date(x).getTime() - dayInMs / 2) : index === arr.length - 1 ? new Date(new Date(x).getTime() + dayInMs / 2) : x,
                 y: y.dailyCaloriesLimit
             }
         ]

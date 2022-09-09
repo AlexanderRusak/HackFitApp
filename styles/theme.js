@@ -13,3 +13,9 @@ export const graphColors = {
   red: '#d11507'
 }
 
+export const caloriesGraphColors = {
+  PROTEIN: '#ff91a4',
+  FAT: '#FFAA33',
+  CARBOHYDRATES: '#40B5AD'
+}
+

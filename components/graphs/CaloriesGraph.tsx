@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from "react"
 import { View, Text, StyleSheet } from "react-native"
 import { useSelector } from "react-redux"
-import { VictoryArea, VictoryAxis, VictoryChart, VictoryLine, VictoryPie, VictoryTheme, VictoryZoomContainer } from "victory-native"
+import { VictoryArea, VictoryAxis, VictoryBar, VictoryChart, VictoryLabel, VictoryLine, VictoryPie, VictoryTheme, VictoryZoomContainer } from "victory-native"
 import { Calories, GraphMain } from "../../constants/interfaces/GraphMain"
 import { IStore } from "../../store"
-import { theme } from "../../styles/theme"
-import { getCaloriesAreaData, getFormattedDate, getLineData, getPieData, getSingleLineData, PieDataType } from "../ui/Graph/helpers"
+import { caloriesGraphColors, graphColors, theme } from "../../styles/theme"
+import { dayInMs, getCaloriesAreaData, getFormattedDate, getLineData, getPieData, getSingleLineData, PieDataType } from "../ui/Graph/helpers"
 import { BrushDomain } from "./GlucoseGraphs/Glucose"
 import { BrushComponent } from "./GraphsComponent/BrushComponent"
 import { HeaderComponent } from "./GraphsComponent/HeaderComponent"
@@ -40,7 +40,7 @@ export const CaloriesGraph = ({ }: CaloriesGraphProps) => {
         {
             x: new Date(year, month, day - 5),
             y: {
-                dailyCaloriesLimit: 3000,
+                dailyCaloriesLimit: 2700,
                 carbs: 90,
                 fats: 150,
                 prots: 200,
@@ -49,7 +49,7 @@ export const CaloriesGraph = ({ }: CaloriesGraphProps) => {
         {
             x: new Date(year, month, day - 4),
             y: {
-                dailyCaloriesLimit: 3000,
+                dailyCaloriesLimit: 2700,
                 carbs: 110,
                 fats: 180,
                 prots: 220,
@@ -97,8 +97,8 @@ export const CaloriesGraph = ({ }: CaloriesGraphProps) => {
     const pieData: PieDataType = useMemo(() => getPieData(initData, 1), [initData]);
 
     const lineData = useMemo(() => getSingleLineData(initData, 6), [initData]);
-    console.log(lineData);
-
+    const chartDomainDayPrev = +initData[0].x - dayInMs / 2;
+    const chartDomainDayNext = +initData[initData.length - 1].x + dayInMs / 2;
 
     return <View style={styles.container}>
         <HeaderComponent
@@ -109,12 +109,13 @@ export const CaloriesGraph = ({ }: CaloriesGraphProps) => {
         <View style={styles.graphsContainer}>
             <VictoryChart
                 domain={{
-                    y: [0, 3300]
+                    y: [0, 3600],
+                    x: [chartDomainDayPrev, chartDomainDayNext]
                 }}
                 height={250}
                 theme={VictoryTheme.material}
                 scale={{
-                    x: 'time'
+                    x: 'time',
                 }}
                 containerComponent={<VictoryZoomContainer
                     responsive={false}
@@ -124,77 +125,100 @@ export const CaloriesGraph = ({ }: CaloriesGraphProps) => {
                 />}
 
             >
-                <VictoryArea
-                    data={carbs}
-                    interpolation={'stepBefore'}
-                    style={{
-                        data: {
-                            fill: 'navy'
-                        }
-                    }}
+                <VictoryLine
+                    labelComponent={<VictoryLabel dy={-10} dx={({ data, index }: any) =>
+                        +index === 0 ? 22 : data.length - 1 === +index ? -22 : 0} style={{
+                            fill: ({ index, data }: any) => data[index].y > fats[index].y - fats[index].y0 + carbs[index].y - carbs[index].y0 + prots[index].y - prots[index].y0 ? color : graphColors.red,
+                            fontSize: 16,
+                        }} />}
+                    labels={({ index }: any) => fats[index].y - fats[index].y0 + carbs[index].y - carbs[index].y0 + prots[index].y - prots[index].y0}
+                    data={lineData}
+                    style={{ data: { stroke: graphColors.red }, }}
+
                 />
-                <VictoryArea
-                    interpolation={'stepBefore'}
-                    data={fats}
-                    style={{
-                        data: {
-                            fill: 'orange'
-                        }
-                    }}
-                />
-                <VictoryArea
-                    labels={({datum}) => datum.y}
-                    interpolation={'stepBefore'}
+                <VictoryBar
+                    barWidth={40}
+                    labelComponent={<VictoryLabel dy={12} style={{
+                        fill: color
+                    }} />}
+                    labels={({ datum }) => datum.y - datum.y0}
                     data={prots}
                     style={{
                         data: {
-                            fill: 'pink',
+                            fill: caloriesGraphColors.PROTEIN,
                         },
-                        labels:{
-                            alignSelf:'center'
+                    }}
+                />
+                <VictoryBar
+                    barWidth={40}
+                    labelComponent={<VictoryLabel dy={12} style={{
+                        fill: color
+                    }} />}
+                    labels={({ datum }) => datum.y - datum.y0}
+                    data={fats}
+                    style={{
+                        data: {
+                            fill: caloriesGraphColors.FAT
                         }
                     }}
-                />
-                <VictoryLine
-                    data={lineData}
-                    style={{ data: { stroke: color }, }}
 
                 />
-            </VictoryChart>
-            <View style={styles.pieContainer}>
-                <VictoryPie
-                    height={250}
-                    width={250}
-                    data={pieData}
-                    colorScale={["navy", "orange", "pink",]}
-                    labels={({ datum }) => `${datum.y}%`}
-                    labelRadius={15}
-                    labelPlacement={() => 'parallel'}
-                    padAngle={() => 1}
+                <VictoryBar
+                    barWidth={40}
+                    labelComponent={<VictoryLabel dy={0} style={{
+                        fill: color
+                    }} />}
+                    labels={({ datum }) => datum.y}
+                    data={carbs}
                     style={{
-                        labels: {
-                            fill: 'white',
-                            fontSize: 16,
-                            fontWeight: "bold"
+                        data: {
+                            fill: caloriesGraphColors.CARBOHYDRATES,
+
                         },
                     }}
                 />
-                <View>
-                    <Text>Carbs: {pieData[0].y}%</Text>
-                    <Text>Fats: {pieData[1].y}%</Text>
-                    <Text>Prots: {pieData[2].y}%</Text>
+                <VictoryAxis
+                    crossAxis
+                />
+
+            </VictoryChart>
+            <View style={styles.pieContainer}>
+                <View style={styles.pieGraph}>
+                    <VictoryPie
+                        width={250}
+                        height={250}
+                        data={pieData}
+                        colorScale={[caloriesGraphColors.CARBOHYDRATES, caloriesGraphColors.FAT, caloriesGraphColors.PROTEIN,]}
+                        labels={({ datum }) => `${datum.y}%`}
+                        labelRadius={30}
+                        labelPlacement={() => 'parallel'}
+                        padAngle={() => 5}
+                        innerRadius={20}
+                        style={{
+                            labels: {
+                                fill: color,
+                                fontSize: 16,
+                            },
+                        }}
+                    />
+                </View>
+                <View style={styles.pieLegendContainer} >
+                    <Text style={{ ...styles.pieLegendText, ...styles.pieCarbs }}>Carbs: {pieData[0].y}%</Text>
+                    <Text style={{ ...styles.pieLegendText, ...styles.pieFats }}>Fats: {pieData[1].y}%</Text>
+                    <Text style={{ ...styles.pieLegendText, ...styles.pieProts }}>Prots: {pieData[2].y}%</Text>
                 </View>
             </View>
+            <BrushComponent
+                data={fats}
+                color={color}
+                rangeX={[chartDomainDayPrev, chartDomainDayNext]}
+                rangeY={[0, 3000]}
+                brushDomain={selectedDomain as BrushDomain}
+                onBrushDomainChange={handleBrush}
+                interpolationType='step'
+            />
         </View>
-        {/*         <BrushComponent
-            data={data}
-            color={color}
-            rangeX={[+new Date(year, month, day, hours, minutes - 20), +new Date(year, month, day, hours, minutes - 20)]}
-            rangeY={[0, 3000]}
-            brushDomain={selectedDomain as BrushDomain}
-            onBrushDomainChange={handleBrush}
-            interpolationType='step'
-        /> */}
+
     </View>
 };
 
@@ -203,16 +227,48 @@ const styles = StyleSheet.create({
         display: 'flex',
         height: '100%',
         padding: theme.padding,
-        alignItems: 'center'
+        alignItems: 'center',
+
     },
     graphsContainer: {
         display: 'flex',
+        alignItems: 'center',
+
+        
     },
     pieContainer: {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        height: '35%',
-        backgroundColor: 'red'
+        justifyContent: 'space-evenly',
+        width: '83%',
+        height: '30%',
+    },
+    pieLegendContainer: {
+        display: 'flex',
+        height: '100%',
+        justifyContent: 'space-evenly',
+
+
+    },
+    pieGraph: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 150,
+        height: 150,
+    },
+    pieLegendText: {
+        fontSize: 18,
+        fontWeight: "500"
+    },
+    pieProts: {
+        color: caloriesGraphColors.PROTEIN
+    },
+    pieCarbs: {
+        color: caloriesGraphColors.CARBOHYDRATES
+    },
+    pieFats: {
+        color: caloriesGraphColors.FAT
     }
 })
