@@ -46,17 +46,12 @@ export const SaturationGraph = ({ color }: SaturationGraphProps) => {
     const [selectedDomain, setSelectedDomain] = useState<BrushDomain | DomainTuple>(initialDomain);
 
     const handleZoom = (selectedDomain: BrushDomain) => {
-        console.log(selectedDomain);
-
         setSelectedDomain(selectedDomain);
     }
 
     const handleBrush = (zoomDomain: BrushDomain) => {
         setZoomDomain(zoomDomain);
     }
-
-
-
 
     return <View>
         <HeaderComponent

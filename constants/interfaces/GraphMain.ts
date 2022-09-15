@@ -10,7 +10,7 @@ export interface Nutrition {
 }
 
 export interface Calories {
-    x: Date | number;
+    x: [Date | number, Date | number];
     y: {
         dailyCaloriesLimit: number,
         prots: number,
