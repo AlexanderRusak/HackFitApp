@@ -16,6 +16,7 @@ import {Calories, GraphMain} from '../../constants/interfaces/GraphMain';
 import {IStore} from '../../store';
 import {caloriesGraphColors, graphColors, theme} from '../../styles/theme';
 import {
+  addZero,
   dayInMs,
   getCaloriesAreaData,
   getFormattedDate,
@@ -29,7 +30,6 @@ import {BrushDomain} from './GlucoseGraphs/Glucose';
 import {BrushComponent} from './GraphsComponent/BrushComponent';
 import {HeaderComponent} from './GraphsComponent/HeaderComponent';
 import {DomainTuple} from 'victory-core';
-import {converceNutritionToCalories} from '../../logic/measure/measure.helper';
 
 interface CaloriesGraphProps extends GraphMain {}
 
@@ -38,11 +38,11 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
     (store: IStore) => store.settingsParameter,
   );
 
-  const {day, month, year} = getFormattedDate(new Date());
+  const {day, month, year, hours, minutes} = getFormattedDate(new Date());
 
   const initData: Calories[] = [
     {
-      x: [new Date(year, month, day - 5), new Date(year, month, day - 4)],
+      x: new Date(year, month, day - 5),
       y: {
         dailyCaloriesLimit: 2700,
         carbs: 90,
@@ -51,7 +51,7 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
       },
     },
     {
-      x: [new Date(year, month, day - 4), new Date(year, month, day - 3)],
+      x: new Date(year, month, day - 4),
       y: {
         dailyCaloriesLimit: 2700,
         carbs: 110,
@@ -60,7 +60,7 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
       },
     },
     {
-      x: [new Date(year, month, day - 3), new Date(year, month, day - 2)],
+      x: new Date(year, month, day - 3),
       y: {
         dailyCaloriesLimit: 3000,
         carbs: 120,
@@ -69,7 +69,7 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
       },
     },
     {
-      x: [new Date(year, month, day - 2), new Date(year, month, day - 1)],
+      x: new Date(year, month, day - 2),
       y: {
         dailyCaloriesLimit: 3000,
         carbs: 50,
@@ -78,7 +78,7 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
       },
     },
     {
-      x: [new Date(year, month, day - 1), new Date(year, month, day)],
+      x: new Date(year, month, day - 1),
       y: {
         dailyCaloriesLimit: 3000,
         carbs: 150,
@@ -87,7 +87,7 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
       },
     },
     {
-      x: [new Date(year, month, day), new Date().getTime()],
+      x: new Date(year, month, day),
       y: {
         dailyCaloriesLimit: 3000,
         carbs: 90,
@@ -95,8 +95,8 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
         prots: 210,
       },
     },
+
   ];
-  console.log(initData[initData.length - 1].x);
 
   const [carbs, fats, prots] = useMemo(
     () => getCaloriesAreaData({array: initData}),
@@ -111,23 +111,24 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
   const chartDomainDayPrev = +initData[0].x - dayInMs / 2;
   const chartDomainDayNext = +initData[initData.length - 1].x + dayInMs / 2;
   const brushData = useMemo(() => getSummaryData(initData), [initData]);
-  console.log(lineData);
 
   const initialZoom = useMemo(() => [...brushData].splice(-2), [initData]);
   const initialDomain: BrushDomain = useMemo(
     () => ({
-      x: [initialZoom[0].x, initialZoom[initialZoom.length - 1].x],
+      x: [
+        initialZoom[initialZoom.length - 2].x,
+        initialZoom[initialZoom.length - 1].x,
+      ],
     }),
     [initData],
   );
+
   const [zoomDomain, setZoomDomain] = useState<BrushDomain | DomainTuple>(
     initialDomain,
   );
   const [selectedDomain, setSelectedDomain] = useState<
     BrushDomain | DomainTuple
-  >({
-    x: [brushData[brushData.length - 2].x, brushData[brushData.length - 1].x],
-  } as BrushDomain);
+  >(initialDomain);
 
   const handleZoom = (selectedDomain: BrushDomain) => {
     setSelectedDomain(selectedDomain);
@@ -136,6 +137,8 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
   const handleBrush = (zoomDomain: BrushDomain) => {
     setZoomDomain(zoomDomain);
   };
+
+
 
   return (
     <View style={styles.container}>
@@ -147,13 +150,13 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
       <View style={styles.graphsContainer}>
         <VictoryChart
           domain={{
-            y: [0, 3600],
             x: [chartDomainDayPrev, chartDomainDayNext],
           }}
           height={250}
           scale={{
             x: 'time',
           }}
+          theme={VictoryTheme.material}
           containerComponent={
             <VictoryZoomContainer
               responsive={false}
@@ -196,19 +199,20 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
             style={{data: {stroke: graphColors.red}}}
           />
           <VictoryArea
-            interpolation={'step'}
+            /*             barWidth={({width}) => {
+              return displayBars ? width / displayBars : 390;
+            }} */
+            interpolation={'stepAfter'}
             labelComponent={
               <VictoryLabel
                 dy={12}
-                textAnchor="start"
+                textAnchor="middle"
                 style={{
                   fill: color,
                 }}
               />
             }
-            labels={({datum, index}) =>
-              index % 2 === 0 ? datum.y - datum.y0 : ''
-            }
+            labels={({datum}) => datum.y - datum.y0}
             data={prots}
             style={{
               data: {
@@ -217,20 +221,20 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
             }}
           />
           <VictoryArea
-            interpolation={'step'}
+            /*             barWidth={({width}) => {
+              return displayBars ? width / displayBars : 390;
+            }} */
+            interpolation={'stepAfter'}
             labelComponent={
               <VictoryLabel
                 dy={12}
-                textAnchor="start"
+                textAnchor="middle"
                 style={{
                   fill: color,
-                  textAlign: 'center',
                 }}
               />
             }
-            labels={({datum, index}) =>
-              index % 2 === 0 ? datum.y - datum.y0 : ''
-            }
+            labels={({datum}) => datum.y - datum.y0}
             data={fats}
             style={{
               data: {
@@ -239,19 +243,20 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
             }}
           />
           <VictoryArea
-            interpolation={'step'}
+            /*             barWidth={({width}) => {
+              return displayBars ? width / displayBars : 390;
+            }} */
+            interpolation={'stepAfter'}
             labelComponent={
               <VictoryLabel
                 dy={0}
-                textAnchor="start"
+                textAnchor="middle"
                 style={{
                   fill: color,
                 }}
               />
             }
-            labels={({datum, index}) =>
-              index % 2 === 0 ? datum.y - datum.y0 : ''
-            }
+            labels={({datum}) => datum.y - datum.y0}
             data={carbs}
             style={{
               data: {
@@ -304,7 +309,7 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
           rangeY={[0, 3300]}
           brushDomain={selectedDomain as BrushDomain}
           onBrushDomainChange={handleBrush}
-          interpolationType="step"
+          interpolationType="stepAfter"
         />
       </View>
     </View>

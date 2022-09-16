@@ -59,32 +59,24 @@ export const getAreaData = ({ array, minValue, maxValue }: AreaDataProps) => {
 
 export const getSingleLineData = (data: Calories[], duration: number): { x: Date, y: number }[] => {
     return data.slice(-duration).reduce((prevValue, { x, y }, index, arr) => {
-        const [startDay, endDay] = x;
         return [
 
             ...prevValue,
             {
-                x: index === 0 ? new Date(new Date(startDay).getTime() - dayInMs / 2) : index === arr.length - 1 ? new Date(new Date(startDay).getTime() + dayInMs / 2) : startDay,
+                x: index === 0 ? new Date(new Date(x).getTime() - dayInMs / 2) : index === arr.length - 1 ? new Date(new Date(x).getTime() + dayInMs / 2) : x,
                 y: y.dailyCaloriesLimit
             },
-            {
-                x: index === 0 ? new Date(new Date(endDay).getTime() - dayInMs / 2) : index === arr.length - 1 ? new Date(new Date(endDay).getTime() + dayInMs / 2) : endDay,
-                y: y.dailyCaloriesLimit
-            }
         ]
     }, [] as any[]);
 }
 
 export const getCaloriesAreaData = ({ array }: DataCaloriesProps): [Range[], Range[], Range[]] => {
     return array.reduce((prev, { x, y: nutritionData }) => {
-        const [startDay, endDay] = x;
         const { carbs: carbsMax, fats: fatsMax, prots: protsMax } = converceNutritionToCalories(nutritionData);
-
-
         return [
-            [...prev[0], { x: startDay, y: carbsMax, y0: 0 }, { x: endDay, y: carbsMax, y0: 0 }],
-            [...prev[1], { x: startDay, y: carbsMax + fatsMax, y0: carbsMax }, { x: endDay, y: carbsMax + fatsMax, y0: carbsMax }],
-            [...prev[2], { x: startDay, y: carbsMax + fatsMax + protsMax, y0: carbsMax + fatsMax }, { x: endDay, y: carbsMax + fatsMax + protsMax, y0: carbsMax + fatsMax }]]
+            [...prev[0], { x, y: carbsMax, y0: 0 }],
+            [...prev[1], { x, y: carbsMax + fatsMax, y0: carbsMax }],
+            [...prev[2], { x, y: carbsMax + fatsMax + protsMax, y0: carbsMax + fatsMax }]]
     }, [[] as Range[], [] as Range[], [] as Range[]]);
 }
 
@@ -143,19 +135,14 @@ export const getPieData = (data: Calories[], duration: number = 1): PieDataType 
 export const getSummaryData = (data: Calories[]): BrushComponentData[] => {
     converceNutritionToCalories
     return data.reduce((prev, { x, y }) => {
-        const [startDay, endDay] = x;
         const { carbs, fats, prots }: Nutrition = y;
         const { carbs: carbsCalories, fats: fatsCalories, prots: protsCalories } = converceNutritionToCalories({ carbs, fats, prots } as Nutrition)
 
-        const dailySumStart: BrushComponentData = {
-            x: startDay,
+        const dailySum: BrushComponentData = {
+            x,
             y: carbsCalories + fatsCalories + protsCalories
         }
-        const dailySumEnd: BrushComponentData = {
-            x: endDay,
-            y: carbsCalories + fatsCalories + protsCalories
-        }
-        return [...prev, dailySumStart, dailySumEnd]
+        return [...prev, dailySum]
     }, [] as BrushComponentData[])
 }
 
