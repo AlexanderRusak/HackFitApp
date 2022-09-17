@@ -10,6 +10,7 @@ import {
   VictoryLine,
   VictoryPie,
   VictoryTheme,
+  VictoryTooltip,
   VictoryZoomContainer,
 } from 'victory-native';
 import {Calories, GraphMain} from '../../constants/interfaces/GraphMain';
@@ -22,6 +23,7 @@ import {
   getFormattedDate,
   getLineData,
   getPieData,
+  getRangeDays,
   getSingleLineData,
   getSummaryData,
   PieDataType,
@@ -95,19 +97,19 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
         prots: 210,
       },
     },
-
   ];
 
   const [carbs, fats, prots] = useMemo(
     () => getCaloriesAreaData({array: initData}),
     [initData],
   );
+
   const pieData: PieDataType = useMemo(
     () => getPieData(initData, 1),
     [initData],
   );
 
-  const lineData = useMemo(() => getSingleLineData(initData, 6), [initData]);
+  const lineData = useMemo(() => getSingleLineData(initData), [initData]);
   const chartDomainDayPrev = +initData[0].x - dayInMs / 2;
   const chartDomainDayNext = +initData[initData.length - 1].x + dayInMs / 2;
   const brushData = useMemo(() => getSummaryData(initData), [initData]);
@@ -123,12 +125,17 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
     [initData],
   );
 
+  console.log(lineData);
+  
+
   const [zoomDomain, setZoomDomain] = useState<BrushDomain | DomainTuple>(
     initialDomain,
   );
   const [selectedDomain, setSelectedDomain] = useState<
     BrushDomain | DomainTuple
   >(initialDomain);
+
+  const selectedDays = useMemo(() => getRangeDays(zoomDomain), [zoomDomain]);
 
   const handleZoom = (selectedDomain: BrushDomain) => {
     setSelectedDomain(selectedDomain);
@@ -138,7 +145,7 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
     setZoomDomain(zoomDomain);
   };
 
-
+  console.log(lineData);
 
   return (
     <View style={styles.container}>
@@ -148,124 +155,130 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
         measuringUnit={energy}
       />
       <View style={styles.graphsContainer}>
-        <VictoryChart
-          domain={{
-            x: [chartDomainDayPrev, chartDomainDayNext],
-          }}
-          height={250}
-          scale={{
-            x: 'time',
-          }}
-          theme={VictoryTheme.material}
-          containerComponent={
-            <VictoryZoomContainer
-              responsive={false}
-              zoomDimension="x"
-              zoomDomain={zoomDomain as BrushDomain}
-              onZoomDomainChange={handleZoom}
+        <View style={styles.chartContainer}>
+          <VictoryChart
+            maxDomain={{
+              y: 3600,
+            }}
+            minDomain={{
+              x: new Date(year, month, day - 5).getTime(),
+            }}
+            height={250}
+            scale={{
+              x: 'time',
+            }}
+            theme={VictoryTheme.material}
+            containerComponent={
+              <VictoryZoomContainer
+                responsive={true}
+                zoomDimension="x"
+                zoomDomain={zoomDomain as BrushDomain}
+                onZoomDomainChange={handleZoom}
+              />
+            }>
+            <VictoryLine
+              labelComponent={
+                <VictoryLabel
+                  dy={-10}
+                  dx={() => `${100 / (selectedDays - 1) / 2}%`}
+                  style={{
+                    fill: ({index, data}: any) => {
+                      return data[index].y >
+                        fats[index].y -
+                          fats[index].y0 +
+                          carbs[index].y -
+                          carbs[index].y0 +
+                          prots[index].y -
+                          prots[index].y0
+                        ? color
+                        : graphColors.red;
+                    },
+                    fontSize: 14,
+                  }}
+                />
+              }
+              labels={({index}: any) => {
+                const sum =
+                  fats[index].y -
+                  fats[index].y0 +
+                  carbs[index].y -
+                  carbs[index].y0 +
+                  prots[index].y -
+                  prots[index].y0;
+
+                return +index === lineData.length - 1 ? null : sum;
+              }}
+              data={lineData}
+              style={{data: {stroke: graphColors.red}}}
             />
-          }>
-          <VictoryLine
-            labelComponent={
-              <VictoryLabel
-                dy={-10}
-                dx={({data, index}: any) =>
-                  +index === 0 ? 22 : data.length - 1 === +index ? -22 : 0
-                }
-                style={{
-                  fill: ({index, data}: any) =>
-                    data[index].y >
-                    fats[index].y -
-                      fats[index].y0 +
-                      carbs[index].y -
-                      carbs[index].y0 +
-                      prots[index].y -
-                      prots[index].y0
-                      ? color
-                      : graphColors.red,
-                  fontSize: 16,
-                }}
-              />
-            }
-            labels={({index}: any) =>
-              fats[index].y -
-              fats[index].y0 +
-              carbs[index].y -
-              carbs[index].y0 +
-              prots[index].y -
-              prots[index].y0
-            }
-            data={lineData}
-            style={{data: {stroke: graphColors.red}}}
-          />
-          <VictoryArea
-            /*             barWidth={({width}) => {
-              return displayBars ? width / displayBars : 390;
-            }} */
-            interpolation={'stepAfter'}
-            labelComponent={
-              <VictoryLabel
-                dy={12}
-                textAnchor="middle"
-                style={{
-                  fill: color,
-                }}
-              />
-            }
-            labels={({datum}) => datum.y - datum.y0}
-            data={prots}
-            style={{
-              data: {
-                fill: caloriesGraphColors.PROTEIN,
-              },
-            }}
-          />
-          <VictoryArea
-            /*             barWidth={({width}) => {
-              return displayBars ? width / displayBars : 390;
-            }} */
-            interpolation={'stepAfter'}
-            labelComponent={
-              <VictoryLabel
-                dy={12}
-                textAnchor="middle"
-                style={{
-                  fill: color,
-                }}
-              />
-            }
-            labels={({datum}) => datum.y - datum.y0}
-            data={fats}
-            style={{
-              data: {
-                fill: caloriesGraphColors.FAT,
-              },
-            }}
-          />
-          <VictoryArea
-            /*             barWidth={({width}) => {
-              return displayBars ? width / displayBars : 390;
-            }} */
-            interpolation={'stepAfter'}
-            labelComponent={
-              <VictoryLabel
-                dy={0}
-                textAnchor="middle"
-                style={{
-                  fill: color,
-                }}
-              />
-            }
-            labels={({datum}) => datum.y - datum.y0}
-            data={carbs}
-            style={{
-              data: {
-                fill: caloriesGraphColors.CARBOHYDRATES,
-              },
-            }}
-          />
-          <VictoryAxis crossAxis />
-        </VictoryChart>
+            <VictoryArea
+              interpolation={'stepAfter'}
+              labelComponent={
+                <VictoryLabel
+                  dy={12}
+                  dx={() => `${100 / (selectedDays - 1) / 2}%`}
+                  style={{
+                    fill: color,
+                  }}
+                />
+              }
+              labels={({datum, index}) =>
+                +index === prots.length - 1 ? null : datum.y - datum.y0
+              }
+              data={prots}
+              style={{
+                data: {
+                  fill: caloriesGraphColors.PROTEIN,
+                },
+              }}
+            />
+            <VictoryArea
+              interpolation={'stepAfter'}
+              labelComponent={
+                <VictoryLabel
+                  dx={() => `${100 / (selectedDays - 1) / 2}%`}
+                  dy={12}
+                  textAnchor="middle"
+                  style={{
+                    fill: color,
+                  }}
+                />
+              }
+              labels={({datum, index}) =>
+                +index === fats.length - 1 ? null : datum.y - datum.y0
+              }
+              data={fats}
+              style={{
+                data: {
+                  fill: caloriesGraphColors.FAT,
+                },
+              }}
+            />
+            <VictoryArea
+              interpolation={'stepAfter'}
+              labelComponent={
+                <VictoryLabel
+                  dx={() => `${100 / (selectedDays - 1) / 2}%`}
+                  dy={0}
+                  textAnchor="middle"
+                  style={{
+                    fill: color,
+                  }}
+                />
+              }
+              labels={({datum, index}) =>
+                +index === carbs.length - 1 ? null : datum.y - datum.y0
+              }
+              data={carbs}
+              style={{
+                data: {
+                  fill: caloriesGraphColors.CARBOHYDRATES,
+                },
+              }}
+            />
+            <VictoryAxis crossAxis />
+          </VictoryChart>
+        </View>
         <View style={styles.pieContainer}>
           <View style={styles.pieGraph}>
             <VictoryPie
@@ -306,7 +319,7 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
           data={brushData}
           color={color}
           rangeX={[brushData[0].x, brushData[brushData.length - 1].x]}
-          rangeY={[0, 3300]}
+          rangeY={[0, 3600]}
           brushDomain={selectedDomain as BrushDomain}
           onBrushDomainChange={handleBrush}
           interpolationType="stepAfter"
@@ -327,6 +340,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
   },
+  chartContainer: {},
   pieContainer: {
     display: 'flex',
     flexDirection: 'row',

@@ -1,6 +1,7 @@
 import { DomainTuple } from "victory-core";
 import { Calories, Nutrition, Range } from "../../../constants/interfaces/GraphMain";
 import { converceNutritionToCalories, DefaultCaroliesValues, getDefaultNutririonValues, getFloorValue } from "../../../logic/measure/measure.helper";
+import { BrushDomain } from "../../graphs/GlucoseGraphs/Glucose";
 import { BrushComponentData } from "../../graphs/GraphsComponent/BrushComponent";
 
 export type NutritionNames = 'carbs' | 'prots' | 'fats';
@@ -57,27 +58,50 @@ export const getAreaData = ({ array, minValue, maxValue }: AreaDataProps) => {
     return initArray
 };
 
-export const getSingleLineData = (data: Calories[], duration: number): { x: Date, y: number }[] => {
-    return data.slice(-duration).reduce((prevValue, { x, y }, index, arr) => {
+export const getSingleLineData = (data: Calories[]): { x: Date, y: number }[] => {
+    const lineDate = data.reduce((prevValue, { x, y }, index, arr) => {
         return [
-
             ...prevValue,
             {
-                x: index === 0 ? new Date(new Date(x).getTime() - dayInMs / 2) : index === arr.length - 1 ? new Date(new Date(x).getTime() + dayInMs / 2) : x,
+                x,
                 y: y.dailyCaloriesLimit
             },
         ]
     }, [] as any[]);
+    const { day, month, year } = getFormattedDate(new Date())
+
+
+    return [ ...lineDate, { x: new Date(year, month, day + 1), y: lineDate[lineDate.length - 1].y }]
 }
 
 export const getCaloriesAreaData = ({ array }: DataCaloriesProps): [Range[], Range[], Range[]] => {
-    return array.reduce((prev, { x, y: nutritionData }) => {
+    const [carbs, fats, prots] = array.reduce((prev, { x, y: nutritionData }) => {
         const { carbs: carbsMax, fats: fatsMax, prots: protsMax } = converceNutritionToCalories(nutritionData);
         return [
             [...prev[0], { x, y: carbsMax, y0: 0 }],
             [...prev[1], { x, y: carbsMax + fatsMax, y0: carbsMax }],
             [...prev[2], { x, y: carbsMax + fatsMax + protsMax, y0: carbsMax + fatsMax }]]
     }, [[] as Range[], [] as Range[], [] as Range[]]);
+
+    const { day, month, year } = getFormattedDate(new Date());
+
+    const additionalCarb: Range = {
+        x: new Date(year, month, day + 1),
+        y: carbs[carbs.length - 1].y,
+        y0: carbs[carbs.length - 1].y0,
+    };
+    const additionalFat: Range = {
+        x: new Date(year, month, day + 1),
+        y: fats[fats.length - 1].y,
+        y0: fats[fats.length - 1].y0,
+    };
+    const additionalProt: Range = {
+        x: new Date(year, month, day + 1),
+        y: prots[prots.length - 1].y,
+        y0: prots[prots.length - 1].y0,
+    };
+    const caloriesToupleData = [[...carbs, additionalCarb], [...fats, additionalFat], [...prots, additionalProt]];
+    return caloriesToupleData as [Range[], Range[], Range[]]
 }
 
 
@@ -133,8 +157,7 @@ export const getPieData = (data: Calories[], duration: number = 1): PieDataType 
 }
 
 export const getSummaryData = (data: Calories[]): BrushComponentData[] => {
-    converceNutritionToCalories
-    return data.reduce((prev, { x, y }) => {
+    const summaryData = data.reduce((prev, { x, y }) => {
         const { carbs, fats, prots }: Nutrition = y;
         const { carbs: carbsCalories, fats: fatsCalories, prots: protsCalories } = converceNutritionToCalories({ carbs, fats, prots } as Nutrition)
 
@@ -142,10 +165,21 @@ export const getSummaryData = (data: Calories[]): BrushComponentData[] => {
             x,
             y: carbsCalories + fatsCalories + protsCalories
         }
-        return [...prev, dailySum]
-    }, [] as BrushComponentData[])
-}
 
+        return [...prev, dailySum]
+    }, [] as BrushComponentData[]);
+    const { day, month, year } = getFormattedDate(new Date())
+
+    return [...summaryData, {
+        x: new Date(year, month, day + 1),
+        y: summaryData[summaryData.length - 1].y
+    }]
+}
+export const getRangeDays = (domain: DomainTuple | BrushDomain) =>
+    //@ts-ignore
+    new Date(new Date(domain.x[1]).getTime() -
+        //@ts-ignore
+        new Date(domain.x[0]).getTime()).getDate()
 export const getFormattedDate = (time: number | Date, dateSeparator = '/', timeSeparator = ':'): {
     day: number,
     month: number,
