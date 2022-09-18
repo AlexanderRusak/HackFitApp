@@ -11,6 +11,7 @@ import {
 import {addZero} from '../../ui/Graph/helpers';
 import {BrushDomain} from '../GlucoseGraphs/Glucose';
 import {InterpolationPropType} from 'victory-core';
+import {Text} from 'react-native-paper';
 
 export interface BrushComponentData {
   x: any;

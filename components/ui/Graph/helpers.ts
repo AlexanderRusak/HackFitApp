@@ -5,6 +5,7 @@ import { BrushDomain } from "../../graphs/GlucoseGraphs/Glucose";
 import { BrushComponentData } from "../../graphs/GraphsComponent/BrushComponent";
 
 export type NutritionNames = 'carbs' | 'prots' | 'fats';
+
 interface DataProps {
     array: any[],
 }
@@ -23,6 +24,7 @@ interface AreaDataProps extends DataProps {
 
 interface PieData {
     y: number;
+    date: [number | Date, number | Date]
 }
 
 interface PieDataProteins extends PieData {
@@ -39,12 +41,16 @@ interface PieDataCarbs extends PieData {
 export type PieDataType = [
     PieDataCarbs,
     PieDataFats,
-    PieDataProteins
+    PieDataProteins,
 ]
 
 
 export const dayInMs = 86400000;
 
+export const isMinBrush = ({ x }: BrushDomain) => {
+    //@ts-ignore
+    return (new Date(x[1]) - new Date(x[0])) >= dayInMs - 5
+}
 
 export const getAreaData = ({ array, minValue, maxValue }: AreaDataProps) => {
     const initArray = Array(array.length);
@@ -71,7 +77,7 @@ export const getSingleLineData = (data: Calories[]): { x: Date, y: number }[] =>
     const { day, month, year } = getFormattedDate(new Date())
 
 
-    return [ ...lineDate, { x: new Date(year, month, day + 1), y: lineDate[lineDate.length - 1].y }]
+    return [...lineDate, { x: new Date(year, month, day + 1), y: lineDate[lineDate.length - 1].y }]
 }
 
 export const getCaloriesAreaData = ({ array }: DataCaloriesProps): [Range[], Range[], Range[]] => {
@@ -116,25 +122,39 @@ export const getLineData = ({ array, value }: AreaLineProps) => {
     return initArray
 };
 
-export const getPieData = (data: Calories[], duration: number = 1): PieDataType => {
+const convetDateToNumber = (value: Date | number) => new Date(value).getTime()
 
+const getRangedArrayData = (data: Calories[], minRange: number, maxRange: number) => {
+    const rangedData = data.filter(({ x }) => {
+        const itemDate = convetDateToNumber(x);
+        const isInRange = itemDate >= minRange && itemDate <= maxRange;
+        return isInRange;
+    });
+    return rangedData.length ? rangedData : [data[data.length - 1]];
+}
+
+export const getPieData = (data: Calories[], { x }: BrushDomain): PieDataType => {
+    const maxRange = convetDateToNumber(x[1]);
+    const minRange = convetDateToNumber(x[0]);
+    const selectedArray = getRangedArrayData(data, minRange, maxRange);
     const initData: PieDataType = [
         {
             x: 'Carbs',
             y: 0,
+            date: [0,0]
         },
         {
             x: 'Fats',
             y: 0,
+            date: [0,0]
         },
         {
             x: 'Proteins',
             y: 0,
+            date: [0,0]
         }]
 
-
-
-    return data.slice(-duration).reduce((prev, { y: nutritionData }): PieDataType => {
+    return selectedArray.reduce((prev, { y: nutritionData, x }): PieDataType => {
         const { carbs, fats, prots } = converceNutritionToCalories(nutritionData);
         const caloriesSum = nutritionData.dailyCaloriesLimit;
         const { carbs: carbsDefault, fats: fatsDefault, prots: protsDefault } = getDefaultNutririonValues(caloriesSum);
@@ -142,16 +162,19 @@ export const getPieData = (data: Calories[], duration: number = 1): PieDataType 
         return [
             {
                 x: 'Carbs',
-                y: getFloorValue((prev[0].y / 100), carbs, carbsDefault, actuallycalories, nutritionData.dailyCaloriesLimit, 'carbs', duration),
+                y: getFloorValue((prev[0].y / 100), carbs, carbsDefault, actuallycalories, nutritionData.dailyCaloriesLimit, 'carbs', selectedArray.length),
+                date: [selectedArray[0].x, selectedArray[selectedArray.length - 1].x]
             },
             {
                 x: 'Fats',
-                y: getFloorValue((prev[1].y / 100), fats, fatsDefault, actuallycalories, nutritionData.dailyCaloriesLimit, 'fats', duration),
+                y: getFloorValue((prev[1].y / 100), fats, fatsDefault, actuallycalories, nutritionData.dailyCaloriesLimit, 'fats', selectedArray.length),
+                date: [selectedArray[0].x, selectedArray[selectedArray.length - 1].x]
             },
             {
                 x: 'Proteins',
-                y: getFloorValue((prev[2].y / 100), prots, protsDefault, actuallycalories, nutritionData.dailyCaloriesLimit, 'prots', duration),
-            }
+                y: getFloorValue((prev[2].y / 100), prots, protsDefault, actuallycalories, nutritionData.dailyCaloriesLimit, 'prots', selectedArray.length),
+                date: [selectedArray[0].x, selectedArray[selectedArray.length - 1].x]
+            },
         ]
     }, initData);
 }

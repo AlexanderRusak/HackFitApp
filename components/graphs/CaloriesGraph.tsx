@@ -26,12 +26,14 @@ import {
   getRangeDays,
   getSingleLineData,
   getSummaryData,
+  isMinBrush,
   PieDataType,
 } from '../ui/Graph/helpers';
 import {BrushDomain} from './GlucoseGraphs/Glucose';
 import {BrushComponent} from './GraphsComponent/BrushComponent';
 import {HeaderComponent} from './GraphsComponent/HeaderComponent';
 import {DomainTuple} from 'victory-core';
+import {PeriodTextComponent} from './GraphsComponent/PeriodTextComponent';
 
 interface CaloriesGraphProps extends GraphMain {}
 
@@ -104,14 +106,7 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
     [initData],
   );
 
-  const pieData: PieDataType = useMemo(
-    () => getPieData(initData, 1),
-    [initData],
-  );
-
   const lineData = useMemo(() => getSingleLineData(initData), [initData]);
-  const chartDomainDayPrev = +initData[0].x - dayInMs / 2;
-  const chartDomainDayNext = +initData[initData.length - 1].x + dayInMs / 2;
   const brushData = useMemo(() => getSummaryData(initData), [initData]);
 
   const initialZoom = useMemo(() => [...brushData].splice(-2), [initData]);
@@ -125,9 +120,6 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
     [initData],
   );
 
-  console.log(lineData);
-  
-
   const [zoomDomain, setZoomDomain] = useState<BrushDomain | DomainTuple>(
     initialDomain,
   );
@@ -137,6 +129,11 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
 
   const selectedDays = useMemo(() => getRangeDays(zoomDomain), [zoomDomain]);
 
+  const pieData: PieDataType = useMemo(
+    () => getPieData(initData, zoomDomain as BrushDomain),
+    [initData],
+  );
+
   const handleZoom = (selectedDomain: BrushDomain) => {
     setSelectedDomain(selectedDomain);
   };
@@ -145,15 +142,26 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
     setZoomDomain(zoomDomain);
   };
 
-  console.log(lineData);
+  const {formattedDate: startPiePeriod} = useMemo(
+    () => getFormattedDate(pieData[0].date[0], '.'),
+    [pieData],
+  );
+  const {formattedDate: finishPiePeriod} = useMemo(
+    () => getFormattedDate(pieData[0].date[1], '.'),
+    [pieData],
+  );
+
+  console.log(brushData);
+  
 
   return (
     <View style={styles.container}>
       <HeaderComponent
-        currentValue={initData[initData.length - 1].y.dailyCaloriesLimit}
+        currentValue={brushData[brushData.length-1].y}
         headerTitle={'Calories Graph'}
         measuringUnit={energy}
       />
+
       <View style={styles.graphsContainer}>
         <View style={styles.chartContainer}>
           <VictoryChart
@@ -315,15 +323,23 @@ export const CaloriesGraph = ({}: CaloriesGraphProps) => {
             </Text>
           </View>
         </View>
-        <BrushComponent
-          data={brushData}
-          color={color}
-          rangeX={[brushData[0].x, brushData[brushData.length - 1].x]}
-          rangeY={[0, 3600]}
-          brushDomain={selectedDomain as BrushDomain}
-          onBrushDomainChange={handleBrush}
-          interpolationType="stepAfter"
-        />
+        <View>
+          
+            <PeriodTextComponent
+              start={startPiePeriod}
+              finish={finishPiePeriod}
+            />
+
+          <BrushComponent
+            data={brushData}
+            color={color}
+            rangeX={[brushData[0].x, brushData[brushData.length - 1].x]}
+            rangeY={[0, 3600]}
+            brushDomain={selectedDomain as BrushDomain}
+            onBrushDomainChange={handleBrush}
+            interpolationType="stepAfter"
+          />
+        </View>
       </View>
     </View>
   );
@@ -340,7 +356,11 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
   },
-  chartContainer: {},
+  chartContainer: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    height: '40%',
+  },
   pieContainer: {
     display: 'flex',
     flexDirection: 'row',
